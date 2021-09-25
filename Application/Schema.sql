@@ -1,8 +1,10 @@
 -- Your database schema. Use the Schema Designer at http://localhost:8001/ to add some tables.
 CREATE TYPE bid_status AS ENUM ('accepted', 'rejected');
+CREATE TYPE item_status AS ENUM ('active', 'inactive');
 CREATE TABLE items (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY NOT NULL,
-    title TEXT NOT NULL
+    title TEXT NOT NULL,
+    status item_status NOT NULL
 );
 CREATE TABLE bids (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY NOT NULL,
