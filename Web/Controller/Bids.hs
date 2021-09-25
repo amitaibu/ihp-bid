@@ -69,7 +69,7 @@ buildBid bid = bid
 validateIsPriceAboveOtherBids bid = do
     item <- fetch (get #itemId bid)
     -- Get highest bid.
-
+    let highestBid = 50
     bid
-        |> validateField #price (isGreaterThan 50)
+        |> validateField #price (isGreaterThan highestBid)
         |> pure
