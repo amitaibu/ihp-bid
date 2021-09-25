@@ -43,7 +43,8 @@ instance Controller BidsController where
         let bid = newRecord @Bid
         bid
             |> buildBid
-            |> ifValid \case
+            |> validateIsPriceAboveOtherBids
+            >>= ifValid \case
                 Left bid -> do
                     item <- fetch (get #itemId bid)
                     render NewView { .. } 
@@ -59,7 +60,16 @@ instance Controller BidsController where
         redirectTo (ShowItemAction (get #itemId bid))
 
 
+
 buildBid bid = bid
     |> fill @'["itemId","status","price"]
     |> validateField #price (isGreaterThan 0)
     |> set #status Rejected
+
+validateIsPriceAboveOtherBids bid = do
+    item <- fetch (get #itemId bid)
+    -- Get highest bid.
+
+    bid
+        |> validateField #price (isGreaterThan 50)
+        |> pure
