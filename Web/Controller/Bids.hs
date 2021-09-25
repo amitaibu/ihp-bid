@@ -55,7 +55,8 @@ instance Controller BidsController where
         setSuccessMessage "Bid deleted"
         redirectTo (ShowItemAction (get #itemId bid))
 
+
 buildBid bid = bid
-    |> fill @["itemId","status","price"]
+    |> fill @'["itemId","status","price"]
     |> validateField #price (isGreaterThan 0)
     |> set #status Rejected

@@ -15,7 +15,7 @@ instance Controller ItemsController where
         let item = newRecord
         render NewView { .. }
 
-    action ShowItemAction { itemId } = do
+    action ShowItemAction { itemId } = autoRefresh do
         item <- fetch itemId
             >>= pure . modify #bids (orderByDesc #createdAt)
             >>= fetchRelated #bids
