@@ -34,7 +34,7 @@ instance Controller BidsController where
                 Right bid -> do
                     bid <- bid |> updateRecord
                     setSuccessMessage "Bid updated"
-                    redirectTo EditBidAction { .. }
+                    redirectTo (ShowItemAction (get #itemId bid))
 
     action CreateBidAction = do
         let bid = newRecord @Bid

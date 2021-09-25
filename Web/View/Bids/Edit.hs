@@ -19,6 +19,6 @@ renderForm :: Bid -> Html
 renderForm bid = formFor bid [hsx|
     {(hiddenField #itemId)}
     {(hiddenField #status)}
-    {(textField #price)}
+    {(numberField #price)}
     {submitButton}
 |]
