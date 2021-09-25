@@ -8,3 +8,13 @@ data WebApplication = WebApplication deriving (Eq, Show)
 
 
 data StaticController = WelcomeAction deriving (Eq, Show, Data)
+
+data ItemsController
+    = ItemsAction
+    | NewItemAction
+    | ShowItemAction { itemId :: !(Id Item) }
+    | CreateItemAction
+    | EditItemAction { itemId :: !(Id Item) }
+    | UpdateItemAction { itemId :: !(Id Item) }
+    | DeleteItemAction { itemId :: !(Id Item) }
+    deriving (Eq, Show, Data)
