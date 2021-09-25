@@ -11,8 +11,11 @@ instance View ShowView where
                 <li class="breadcrumb-item active">Show Item</li>
             </ol>
         </nav>
-        <h1>Show Item</h1>
-        <p>{get #title item}</p>
+        <div class="my-4">
+            <h1>Show Item</h1>
+            <div>{get #title item}</div>
+            <div>Status: {get #status item}</div>
+        </div>
         <a href={NewBidAction (get #id item)}>Add Bid</a>
         <ol>{forEach (get #bids item) renderBid}</ol>
     |]

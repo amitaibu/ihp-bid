@@ -57,4 +57,5 @@ instance Controller BidsController where
 
 buildBid bid = bid
     |> fill @["itemId","status","price"]
+    |> validateField #price (isGreaterThan 0)
     |> set #status Rejected

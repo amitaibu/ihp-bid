@@ -55,3 +55,4 @@ instance Controller ItemsController where
 
 buildItem item = item
      |> fill @'["title"]
+     |> set #status Inactive
