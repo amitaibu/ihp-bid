@@ -18,3 +18,13 @@ data ItemsController
     | UpdateItemAction { itemId :: !(Id Item) }
     | DeleteItemAction { itemId :: !(Id Item) }
     deriving (Eq, Show, Data)
+
+data BidsController
+    = BidsAction
+    | NewBidAction { itemId :: !(Id Item) }
+    | ShowBidAction { bidId :: !(Id Bid) }
+    | CreateBidAction
+    | EditBidAction { bidId :: !(Id Bid) }
+    | UpdateBidAction { bidId :: !(Id Bid) }
+    | DeleteBidAction { bidId :: !(Id Bid) }
+    deriving (Eq, Show, Data)

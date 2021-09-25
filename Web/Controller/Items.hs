@@ -17,6 +17,7 @@ instance Controller ItemsController where
 
     action ShowItemAction { itemId } = do
         item <- fetch itemId
+            >>= fetchRelated #bids
         render ShowView { .. }
 
     action EditItemAction { itemId } = do
