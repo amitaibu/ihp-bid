@@ -2,8 +2,7 @@
 CREATE TYPE bid_status AS ENUM ('accepted', 'rejected');
 CREATE TABLE items (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY NOT NULL,
-    title TEXT NOT NULL,
-    price INT NOT NULL
+    title TEXT NOT NULL
 );
 CREATE TABLE bids (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY NOT NULL,
