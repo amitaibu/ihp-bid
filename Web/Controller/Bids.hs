@@ -57,3 +57,4 @@ instance Controller BidsController where
 
 buildBid bid = bid
     |> fill @["itemId","status","price"]
+    |> set #status Rejected
