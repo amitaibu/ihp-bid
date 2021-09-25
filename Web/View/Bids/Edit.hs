@@ -1,13 +1,16 @@
 module Web.View.Bids.Edit where
 import Web.View.Prelude
 
-data EditView = EditView { bid :: Bid }
+data EditView = EditView
+    { bid :: Bid 
+    , item :: Item
+    }
 
 instance View EditView where
     html EditView { .. } = [hsx|
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href={BidsAction}>Bids</a></li>
+                <li class="breadcrumb-item"><a href={ShowItemAction (get #itemId bid)}>Item {get #title item}</a></li>
                 <li class="breadcrumb-item active">Edit Bid</li>
             </ol>
         </nav>

@@ -23,6 +23,7 @@ instance Controller BidsController where
 
     action EditBidAction { bidId } = do
         bid <- fetch bidId
+        item <- fetch (get #itemId bid)
         render EditView { .. }
 
     action UpdateBidAction { bidId } = do
@@ -30,7 +31,9 @@ instance Controller BidsController where
         bid
             |> buildBid
             |> ifValid \case
-                Left bid -> render EditView { .. }
+                Left bid -> do 
+                    item <- fetch (get #itemId bid)
+                    render EditView { .. }
                 Right bid -> do
                     bid <- bid |> updateRecord
                     setSuccessMessage "Bid updated"
