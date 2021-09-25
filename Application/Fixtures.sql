@@ -16,6 +16,7 @@ SET SESSION AUTHORIZATION DEFAULT;
 
 ALTER TABLE public.items DISABLE TRIGGER ALL;
 
+INSERT INTO public.items (id, title) VALUES ('0b45ee42-6245-4aab-8820-6d0ad00079ad', 'First item');
 
 
 ALTER TABLE public.items ENABLE TRIGGER ALL;
