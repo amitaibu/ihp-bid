@@ -18,6 +18,5 @@ instance View EditView where
 renderForm :: Item -> Html
 renderForm item = formFor item [hsx|
     {(textField #title)}
-    {(textField #price)}
     {submitButton}
 |]

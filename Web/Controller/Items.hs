@@ -52,4 +52,4 @@ instance Controller ItemsController where
         redirectTo ItemsAction
 
 buildItem item = item
-    |> fill @["title","price"]
+     |> fill @'["title"]
