@@ -12,8 +12,7 @@ instance View ShowView where
             </ol>
         </nav>
         <div class="my-4">
-            <h1>Show Item</h1>
-            <div>{get #title item}</div>
+            <h1>{get #title item}</h1>
             <div>Status: {get #status item}</div>
         </div>
         <a href={NewBidAction (get #id item)}>Add Bid</a>
