@@ -14,14 +14,14 @@ instance View ShowView where
         <h1>Show Item</h1>
         <p>{get #title item}</p>
         <a href={NewBidAction (get #id item)}>Add Bid</a>
-        <div>{forEach (get #bids item) renderBid}</div>
+        <ol>{forEach (get #bids item) renderBid}</ol>
     |]
 
 renderBid bid = [hsx|
-    <div class="mt-4">
+    <li class="mt-4">
         <a href={EditBidAction (get #id bid)}>Edit Bid</a>
         <div>Price: ${get #price bid}</div>
         <div>Status: {get #status bid}</div>
         <div>{get #createdAt bid |> timeAgo}</div>
-    </div>
+    </li>
 |]
