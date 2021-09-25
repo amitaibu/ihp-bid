@@ -19,7 +19,8 @@ instance View ShowView where
 
 renderBid bid = [hsx|
     <div class="mt-4">
-        <h5>{get #id bid}</h5>
+        {get #id bid}
+        <a href={EditBidAction (get #id bid)}>Edit</a>
         <p>{get #price bid}</p>
     </div>
 |]

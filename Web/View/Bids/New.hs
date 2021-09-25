@@ -21,7 +21,7 @@ instance View NewView where
 renderForm :: Bid -> Html
 renderForm bid = formFor bid [hsx|
     {(hiddenField #itemId)}
-    {(textField #status)}
+    {(hiddenField #status)}
     {(textField #price)}
     {submitButton}
 |]
