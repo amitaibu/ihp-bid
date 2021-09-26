@@ -5,6 +5,7 @@ import Web.View.Bids.Index
 import Web.View.Bids.New
 import Web.View.Bids.Edit
 import Web.View.Bids.Show
+import Control.Concurrent.MVar
 
 instance Controller BidsController where
     action BidsAction = do
@@ -40,12 +41,13 @@ instance Controller BidsController where
                     redirectTo (ShowItemAction (get #itemId bid))
 
     action CreateBidAction = do
+        m <- newEmptyMVar
         let bid = newRecord @Bid
         bid
-            |> buildBid
-            |> validateIsPriceAboveOtherBids
+            |> buildBid            
+            |> validateIsPriceAboveOtherBids            
             >>= ifValid \case
-                Left bid -> do
+                Left bid -> do                    
                     item <- fetch (get #itemId bid)
                     render NewView { .. } 
                 Right bid -> do
@@ -68,8 +70,11 @@ buildBid bid = bid
 
 validateIsPriceAboveOtherBids bid = do
     item <- fetch (get #itemId bid)
-    -- Get highest bid.
-    let highestBid = 50
+    -- @todo: Get highest bid.
+    let highestBidPrice = gethighestBidPrice (get #bids item)
     bid
-        |> validateField #price (isGreaterThan highestBid)
+        |> validateField #price (isGreaterThan highestBidPrice)
         |> pure
+
+
+gethighestBidPrice bids = 50

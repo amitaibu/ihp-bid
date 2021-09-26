@@ -18,5 +18,13 @@ instance View EditView where
 renderForm :: Item -> Html
 renderForm item = formFor item [hsx|
     {(textField #title)}
+    {selectField #status allStatus}
     {submitButton}
 |]
+    where 
+        allStatus = allEnumValues @ItemStatus
+
+instance CanSelect ItemStatus where
+    type SelectValue ItemStatus = ItemStatus
+    selectValue value = value
+    selectLabel = tshow

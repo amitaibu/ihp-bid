@@ -40,6 +40,7 @@ instance Controller ItemsController where
         let item = newRecord @Item
         item
             |> buildItem
+            |> set #status Inactive
             |> ifValid \case
                 Left item -> render NewView { .. } 
                 Right item -> do
@@ -54,5 +55,5 @@ instance Controller ItemsController where
         redirectTo ItemsAction
 
 buildItem item = item
-     |> fill @'["title"]
-     |> set #status Inactive
+     |> fill @'["title", "status"]
+     
