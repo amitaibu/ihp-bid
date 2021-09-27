@@ -1,9 +1,10 @@
 module Web.View.Bids.New where
 import Web.View.Prelude
 
-data NewView = NewView 
-    { bid :: Bid 
+data NewView = NewView
+    { bid :: Bid
     , item :: Item
+    , itemBids :: [Bid]
     }
 
 instance View NewView where
@@ -15,13 +16,30 @@ instance View NewView where
             </ol>
         </nav>
         <h1>New Bid</h1>
-        {renderForm bid}
+        {renderForm itemBids bid}
     |]
 
-renderForm :: Bid -> Html
-renderForm bid = formFor bid [hsx|
-    {(hiddenField #itemId)}
-    {(hiddenField #status)}
-    {(numberField #price)}
-    {submitButton}
-|]
+renderForm :: [Bid] -> Bid -> Html
+renderForm itemBids bid =
+    formFor bid [hsx|
+        {(hiddenField #itemId)}
+        {(hiddenField #status)}
+        {(numberField #price) {
+             helpText =
+                if highestBidPrice > 0
+                    then "Price should be above the current highest Bid which is " ++ show highestBidPrice
+                    else ""
+            }
+        }
+        {submitButton}
+    |]
+    where
+        highestBidPrice =
+            map (get #price) itemBids
+                |> maximum'
+
+
+-- @todo: Remove duplication. Where to move?
+maximum' :: (Num a, Ord a) => [a] -> a
+maximum' [] = 0
+maximum' xs = foldr1 (\x y ->if x >= y then x else y) xs

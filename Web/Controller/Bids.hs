@@ -16,6 +16,7 @@ instance Controller BidsController where
         let bid = newRecord
                 |> set #itemId itemId
         item <- fetch itemId
+        itemBids <- fetch (get #bids item)
         render NewView { .. }
 
     action ShowBidAction { bidId } = do
@@ -49,6 +50,7 @@ instance Controller BidsController where
             >>= ifValid \case
                 Left bid -> do
                     item <- fetch (get #itemId bid)
+                    itemBids <- fetch (get #bids item)
                     render NewView { .. }
                 Right bid -> do
                     bid <- bid |> createRecord
