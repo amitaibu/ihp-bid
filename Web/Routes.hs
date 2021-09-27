@@ -10,3 +10,4 @@ instance AutoRoute ItemsController
 
 instance AutoRoute BidsController
 
+instance AutoRoute SessionsController
