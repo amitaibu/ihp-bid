@@ -31,6 +31,7 @@ instance Controller ItemsController where
         item
             |> buildItem
             |> validateNoOtherActiveItem
+            >>= validateNoRecentBid
             >>= ifValid \case
                 Left item -> render EditView { .. }
                 Right item -> do
@@ -63,25 +64,53 @@ buildItem item = item
 
 
 {-| Validate that no other Item is already Active.
-|-}
+-}
 validateNoOtherActiveItem item = do
     activeItems <- query @Item
         |> filterWhere (#status, Active)
+        |> filterWhereNot (#id, get #id item)
         |> fetchCount
 
     if activeItems == 0 then
+        -- No change.
         pure item
     else
         item
-            |> attachFailure #status (show errorHtml)
+            |> attachFailure #status "Another Item is already marked as Active."
             |> pure
-    where
-        errorHtml = [hsx|
-                Another Item is already marked as Active.
-            |]
 
 
 
+{-| If a Bid was submitted less than the a number of a seconds, don't allow switching an Active item to
+Inactive.
+-}
 
 
+validateNoRecentBid item = do
+    -- @todo: Get diff seconds from config.
+    let seconds = 20
+    currentTime <- getCurrentTime
+    originalItem <- fetch (get #id item)
+    bids <- get #bids item
+        |> orderByDesc #createdAt
+        |> limit 1
+        |> fetch
 
+    case bids of
+        [] ->
+            -- No bids, so no change.
+            pure item
+
+        (bid: _) -> do
+            let bidCreatedAt = get #createdAt bid |> debug
+            let currentTimeDiffInSeconds = diffUTCTime currentTime bidCreatedAt
+                        |> nominalDiffTimeToSeconds
+
+            if get #status originalItem == Active && get #status item == Inactive && currentTimeDiffInSeconds < seconds
+                then
+                    item
+                        |> attachFailure #status ("Last bid was created less than " ++ show seconds ++ " seconds ago: " ++ show currentTimeDiffInSeconds)
+                        |> pure
+                else
+                    -- No change.
+                    pure item
