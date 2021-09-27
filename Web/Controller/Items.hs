@@ -44,8 +44,7 @@ instance Controller ItemsController where
         item
             |> buildItem
             |> set #status Inactive
-            |> validateNoOtherActiveItem
-            >>= ifValid \case
+            |> ifValid \case
                 Left item -> render NewView { .. }
                 Right item -> do
                     item <- item |> createRecord
