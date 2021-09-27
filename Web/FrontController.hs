@@ -10,6 +10,7 @@ import Web.Controller.Items
 import Web.Controller.Static
 import IHP.LoginSupport.Middleware
 import Web.Controller.Sessions
+import Web.Controller.Users
 
 instance FrontController WebApplication where
     controllers =
@@ -18,6 +19,7 @@ instance FrontController WebApplication where
         -- Generator Marker
         , parseRoute @BidsController
         , parseRoute @ItemsController
+        , parseRoute @UsersController
         ]
 
 instance InitControllerContext WebApplication where

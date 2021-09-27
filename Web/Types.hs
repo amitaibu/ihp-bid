@@ -36,6 +36,14 @@ data SessionsController
     | DeleteSessionAction
     deriving (Eq, Show, Data)
 
+data UsersController
+    = NewUserAction
+    | CreateUserAction
+    | EditUserAction { userId :: !(Id User) }
+    | UpdateUserAction { userId :: !(Id User) }
+    | UsersAction
+    deriving (Eq, Show, Data)
+
 instance HasNewSessionUrl User where
     newSessionUrl _ = "/NewSession"
 
