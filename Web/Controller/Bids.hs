@@ -32,7 +32,7 @@ instance Controller BidsController where
         bid
             |> buildBid
             |> ifValid \case
-                Left bid -> do 
+                Left bid -> do
                     item <- fetch (get #itemId bid)
                     render EditView { .. }
                 Right bid -> do
@@ -44,12 +44,12 @@ instance Controller BidsController where
         m <- newEmptyMVar
         let bid = newRecord @Bid
         bid
-            |> buildBid            
-            |> validateIsPriceAboveOtherBids            
+            |> buildBid
+            |> validateIsPriceAboveOtherBids
             >>= ifValid \case
-                Left bid -> do                    
+                Left bid -> do
                     item <- fetch (get #itemId bid)
-                    render NewView { .. } 
+                    render NewView { .. }
                 Right bid -> do
                     bid <- bid |> createRecord
                     setSuccessMessage "Bid created"

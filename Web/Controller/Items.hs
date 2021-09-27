@@ -45,7 +45,7 @@ instance Controller ItemsController where
             |> set #status Inactive
             |> validateNoOtherActiveItem
             >>= ifValid \case
-                Left item -> render NewView { .. } 
+                Left item -> render NewView { .. }
                 Right item -> do
                     item <- item |> createRecord
                     setSuccessMessage "Item created"
@@ -59,8 +59,8 @@ instance Controller ItemsController where
 
 buildItem item = item
      |> fill @'["title", "status"]
-     
-     
+
+
 
 {-| Validate that no other Item is already Active.
 |-}
@@ -79,9 +79,9 @@ validateNoOtherActiveItem item = do
         errorHtml = [hsx|
                 Another Item is already marked as Active.
             |]
-            
 
-    
+
+
 
 
 

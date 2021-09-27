@@ -2,7 +2,7 @@ module Web.View.Bids.Edit where
 import Web.View.Prelude
 
 data EditView = EditView
-    { bid :: Bid 
+    { bid :: Bid
     , item :: Item
     }
 
