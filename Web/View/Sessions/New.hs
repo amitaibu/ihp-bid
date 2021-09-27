@@ -26,5 +26,9 @@ renderForm user = [hsx|
             <input name="password" type="password" class="form-control" placeholder="Password"/>
         </div>
         <button type="submit" class="btn btn-primary btn-block">Login</button>
+
+        <div class="flex items-center justify-between">
+            <a href={NewUserAction}>Signup Instead?</a>
+        </div>
     </form>
 |]
