@@ -5,6 +5,7 @@ import Web.View.Items.Index
 import Web.View.Items.New
 import Web.View.Items.Edit
 import Web.View.Items.Show
+import Web.View.Prelude (hsx)
 
 instance Controller ItemsController where
     action ItemsAction = do
@@ -29,7 +30,8 @@ instance Controller ItemsController where
         item <- fetch itemId
         item
             |> buildItem
-            |> ifValid \case
+            |> validateNoOtherActiveItem
+            >>= ifValid \case
                 Left item -> render EditView { .. }
                 Right item -> do
                     item <- item |> updateRecord
@@ -41,7 +43,8 @@ instance Controller ItemsController where
         item
             |> buildItem
             |> set #status Inactive
-            |> ifValid \case
+            |> validateNoOtherActiveItem
+            >>= ifValid \case
                 Left item -> render NewView { .. } 
                 Right item -> do
                     item <- item |> createRecord
@@ -57,3 +60,28 @@ instance Controller ItemsController where
 buildItem item = item
      |> fill @'["title", "status"]
      
+     
+
+{-| Validate that no other Item is already Active.
+|-}
+validateNoOtherActiveItem item = do
+    activeItems <- query @Item
+        |> filterWhere (#status, Active)
+        |> fetchCount
+
+    if activeItems == 0 then
+        pure item
+    else
+        item
+            |> attachFailure #status (show errorHtml)
+            |> pure
+    where
+        errorHtml = [hsx|
+                Another Item is already marked as Active.
+            |]
+            
+
+    
+
+
+

@@ -75,10 +75,13 @@ validateIsPriceAboveOtherBids bid = do
     let prices = map (get #price) bids
     let highestBidPrice = maximum' prices
     bid
-        |> validateField #price (isGreaterThan highestBidPrice)
+        |> validateField #price (isGreaterThan highestBidPrice |> withCustomErrorMessage ("Price should be higher than the currently highest price: " ++ show highestBidPrice))
         |> pure
     where
-        maximum' :: [Int] -> Int
+        maximum' :: (Num a, Ord a) => [a] -> a
         maximum' [] = 0
         maximum' xs = foldr1 (\x y ->if x >= y then x else y) xs
+
+
+
 
