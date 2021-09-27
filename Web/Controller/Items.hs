@@ -37,7 +37,7 @@ instance Controller ItemsController where
                 Right item -> do
                     item <- item |> updateRecord
                     setSuccessMessage "Item updated"
-                    redirectTo EditItemAction { .. }
+                    redirectTo ShowItemAction { .. }
 
     action CreateItemAction = do
         let item = newRecord @Item
