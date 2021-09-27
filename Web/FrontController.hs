@@ -7,7 +7,6 @@ import Web.View.Layout (defaultLayout)
 -- Controller Imports
 import Web.Controller.Bids
 import Web.Controller.Items
-import Web.Controller.Static
 import IHP.LoginSupport.Middleware
 import Web.Controller.Sessions
 import Web.Controller.Users
