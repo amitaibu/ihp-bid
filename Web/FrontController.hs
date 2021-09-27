@@ -10,8 +10,8 @@ import Web.Controller.Items
 import Web.Controller.Static
 
 instance FrontController WebApplication where
-    controllers = 
-        [ startPage WelcomeAction
+    controllers =
+        [ startPage ItemsAction
         -- Generator Marker
         , parseRoute @BidsController
         , parseRoute @ItemsController
