@@ -31,7 +31,7 @@ instance Controller BidsController where
     action UpdateBidAction { bidId } = do
         bid <- fetch bidId
         bid
-            |> buildBid
+            |> buildBidUpdate
             |> ifValid \case
                 Left bid -> do
                     item <- fetch (get #itemId bid)
@@ -45,8 +45,7 @@ instance Controller BidsController where
         m <- newEmptyMVar
         let bid = newRecord @Bid
         bid
-            |> buildBid
-            |> validateIsPriceAboveOtherBids
+            |> buildBidCreate
             >>= ifValid \case
                 Left bid -> do
                     item <- fetch (get #itemId bid)
@@ -65,10 +64,14 @@ instance Controller BidsController where
 
 
 
-buildBid bid = bid
-    |> fill @'["itemId","status","price"]
+buildBidCreate bid = bid
+    |> fill @["itemId","status","price"]
     |> validateField #price (isGreaterThan 0)
     |> set #status Rejected
+    |> validateIsPriceAboveOtherBids
+
+buildBidUpdate bid = bid
+    |> fill @'["status"]
 
 validateIsPriceAboveOtherBids bid = do
     item <- fetch (get #itemId bid)
