@@ -70,11 +70,15 @@ buildBid bid = bid
 
 validateIsPriceAboveOtherBids bid = do
     item <- fetch (get #itemId bid)
-    -- @todo: Get highest bid.
-    let highestBidPrice = gethighestBidPrice (get #bids item)
+
+    bids <- fetch (get #bids item)
+    let prices = map (get #price) bids
+    let highestBidPrice = maximum' prices
     bid
         |> validateField #price (isGreaterThan highestBidPrice)
         |> pure
+    where
+        maximum' :: [Int] -> Int
+        maximum' [] = 0
+        maximum' xs = foldr1 (\x y ->if x >= y then x else y) xs
 
-
-gethighestBidPrice bids = 50
