@@ -13,12 +13,24 @@ instance Controller BidsController where
         render IndexView { .. }
 
     action NewBidAction { itemId }= do
-        let bid = newRecord
+        item <- fetch itemId
+        itemBids <- fetch (get #bids item)
+
+        let bid' = newRecord
                 |> set #itemId itemId
                 -- Internet bid type by default.
                 |> set #bidType Internet
-        item <- fetch itemId
-        itemBids <- fetch (get #bids item)
+
+        let bid =
+                case getWinningBid itemBids of
+                    Nothing -> bid'
+                    Just winningBid ->
+                        bid'
+                            |> set #price (winningBidPrice + 10)
+                        where
+                            winningBidPrice = get #price winningBid
+
+
         render NewView { .. }
 
     action ShowBidAction { bidId } = do
@@ -76,9 +88,9 @@ buildBidUpdate bid = bid
 
 validateIsPriceAboveOtherBids bid = do
     item <- fetch (get #itemId bid)
-    mwinningBid <- getWinningBid item
+    bids <- fetch (get #bids item)
 
-    case mwinningBid of
+    case getWinningBid bids of
         Nothing ->
             -- No winning bid.
             pure bid
