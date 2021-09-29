@@ -65,9 +65,10 @@ instance Controller BidsController where
 
 
 buildBidCreate bid = bid
-    |> fill @["itemId","status","price"]
+    |> fill @["itemId","status","price", "bidType"]
     |> validateField #price (isGreaterThan 0)
     |> set #status Rejected
+    |> set #bidType Internet
     |> validateIsPriceAboveOtherBids
 
 buildBidUpdate bid = bid

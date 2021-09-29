@@ -16,7 +16,8 @@ SET SESSION AUTHORIZATION DEFAULT;
 
 ALTER TABLE public.items DISABLE TRIGGER ALL;
 
-INSERT INTO public.items (id, title, status) VALUES ('98ff9c09-55d8-4252-b010-5a6c36cb96a8', 'bar', 'inactive');
+INSERT INTO public.items (id, title, status) VALUES ('98ff9c09-55d8-4252-b010-5a6c36cb96a8', 'bar', 'active');
+INSERT INTO public.items (id, title, status) VALUES ('b003ad37-f728-406a-9229-01c9700c3e57', 'Demo page', 'inactive');
 
 
 ALTER TABLE public.items ENABLE TRIGGER ALL;
@@ -24,13 +25,17 @@ ALTER TABLE public.items ENABLE TRIGGER ALL;
 
 ALTER TABLE public.bids DISABLE TRIGGER ALL;
 
-INSERT INTO public.bids (id, item_id, status, price, created_at) VALUES ('e9572876-4269-4332-8e75-aae1fc0ad443', '98ff9c09-55d8-4252-b010-5a6c36cb96a8', 'rejected', 12, '2021-09-27 19:09:32.369987+03');
-INSERT INTO public.bids (id, item_id, status, price, created_at) VALUES ('9c521b96-af81-4d81-b61d-5abab96c7de4', '98ff9c09-55d8-4252-b010-5a6c36cb96a8', 'rejected', 15, '2021-09-27 19:09:41.31371+03');
-INSERT INTO public.bids (id, item_id, status, price, created_at) VALUES ('d747180e-317d-465d-a734-dfb6c4cb92a1', '98ff9c09-55d8-4252-b010-5a6c36cb96a8', 'rejected', 16, '2021-09-27 19:22:12.414543+03');
-INSERT INTO public.bids (id, item_id, status, price, created_at) VALUES ('f7638af3-0f7d-4400-a473-25a78a459cf8', '98ff9c09-55d8-4252-b010-5a6c36cb96a8', 'rejected', 17, '2021-09-27 19:23:23.186931+03');
-INSERT INTO public.bids (id, item_id, status, price, created_at) VALUES ('0a079dbd-6a7d-451a-b7aa-86f4aee60c0b', '98ff9c09-55d8-4252-b010-5a6c36cb96a8', 'rejected', 19, '2021-09-27 20:23:29.155941+03');
 
 
 ALTER TABLE public.bids ENABLE TRIGGER ALL;
+
+
+ALTER TABLE public.users DISABLE TRIGGER ALL;
+
+INSERT INTO public.users (id, email, password_hash, locked_at, failed_login_attempts) VALUES ('20986f14-7085-4f4b-8710-283bf23284a0', 'foo@bar.com', 'sha256|17|t3eYqkPMxoi5N6M/mdrSEg==|B4fHPZNgfPRLbKWjtiylLxKq/NLkVOpGLZbBY3iDxhY=', NULL, 0);
+INSERT INTO public.users (id, email, password_hash, locked_at, failed_login_attempts) VALUES ('2d383cf7-3872-4c4d-83a6-c57f9ffc94e3', 'foo@bar', 'sha256|17|ypnH1uqmG3veZS/+wI2UfQ==|xRggOBVNtGj+tR7q5ZA3loEiuV3XIHTx9gpqJBwLRfg=', NULL, 0);
+
+
+ALTER TABLE public.users ENABLE TRIGGER ALL;
 
 

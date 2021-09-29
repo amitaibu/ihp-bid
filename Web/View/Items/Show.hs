@@ -12,7 +12,7 @@ instance View ShowView where
             </ol>
         </nav>
         <div class="my-4">
-            <h1>{get #title item}</h1> 
+            <h1>{get #title item}</h1>
             <a href={EditItemAction (get #id item)}>Edit</a>
             <div>Status: {get #status item}</div>
         </div>
@@ -25,6 +25,7 @@ renderBid bid = [hsx|
         <a href={EditBidAction (get #id bid)}>Edit Bid</a>
         <div>Price: ${get #price bid}</div>
         <div>Status: {get #status bid}</div>
+        <div>Type: {get #bidType bid}</div>
         <div>{get #createdAt bid |> timeAgo}</div>
     </li>
 |]

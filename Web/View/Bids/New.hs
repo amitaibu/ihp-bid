@@ -31,6 +31,7 @@ renderForm itemBids bid =
                     else ""
             }
         }
+        {selectField #bidType allBidType}
         {submitButton}
     |]
     where
@@ -38,8 +39,15 @@ renderForm itemBids bid =
             map (get #price) itemBids
                 |> maximum'
 
+        allBidType = allEnumValues @BidType
+
 
 -- @todo: Remove duplication. Where to move?
 maximum' :: (Num a, Ord a) => [a] -> a
 maximum' [] = 0
 maximum' xs = foldr1 (\x y ->if x >= y then x else y) xs
+
+instance CanSelect BidType where
+    type SelectValue BidType = BidType
+    selectValue value = value
+    selectLabel = tshow
