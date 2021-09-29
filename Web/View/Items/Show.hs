@@ -17,10 +17,12 @@ instance View ShowView where
             <div>Status: {get #status item}</div>
         </div>
         <a href={NewBidAction (get #id item)}>Add Bid</a>
+        <!-- Reverse <ol> as per https://stackoverflow.com/a/25695025/750039 -->
         <ol style="transform: rotate(180deg);">{forEach (get #bids item) renderBid}</ol>
     |]
 
 renderBid bid = [hsx|
+    <!-- Reverse <li> as per https://stackoverflow.com/a/25695025/750039 -->
     <li class="mt-4" style="transform: rotate(-180deg);">
         <a href={EditBidAction (get #id bid)}>Edit Bid</a>
         <div>Price: ${get #price bid}</div>
