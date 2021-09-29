@@ -5,7 +5,10 @@ import Web.View.Bids.Index
 import Web.View.Bids.New
 import Web.View.Bids.Edit
 import Web.View.Bids.Show
-import Control.Concurrent.MVar
+
+import Control.Concurrent ( forkIO )
+
+
 
 instance Controller BidsController where
     action BidsAction = do
@@ -56,7 +59,6 @@ instance Controller BidsController where
                     redirectTo (ShowItemAction (get #itemId bid))
 
     action CreateBidAction = do
-        m <- newEmptyMVar
         let bid = newRecord @Bid
         bid
             |> buildBidCreate
@@ -67,6 +69,35 @@ instance Controller BidsController where
                     render NewView { .. }
                 Right bid -> do
                     bid <- bid |> createRecord
+
+                    _ <- forkIO $ do
+                        item <- fetch (get #itemId bid)
+                        itemBids <- fetch (get #bids item)
+                        mMailBid <- case getWinningBid itemBids of
+                            Nothing -> pure Nothing
+                            Just winningBid ->
+                                if get #bidType winningBid == Internet
+                                    then do
+                                        mailBid <- newRecord @Bid
+                                                |> set #itemId (get #itemId bid)
+                                                -- Internet bid type by default.
+                                                |> set #bidType AutoMail
+                                                |> set #price ((get #price winningBid) + 10)
+                                                |> createRecord
+
+                                        Just mailBid
+                                            |> pure
+                                    else
+                                        pure Nothing
+
+                        pure ()
+
+
+
+
+
+
+
                     setSuccessMessage "Bid created"
                     redirectTo (ShowItemAction (get #itemId bid))
 
