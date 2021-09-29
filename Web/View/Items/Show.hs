@@ -16,18 +16,49 @@ instance View ShowView where
             <a href={EditItemAction (get #id item)}>Edit</a>
             <div>Status: {get #status item}</div>
         </div>
-        <a href={NewBidAction (get #id item)}>Add Bid</a>
-        <!-- Reverse <ol> as per https://stackoverflow.com/a/25695025/750039 -->
-        <ol style="transform: rotate(180deg);">{forEach (get #bids item) renderBid}</ol>
+        <div>
+            <a class="btn btn-primary mb-4" href={NewBidAction (get #id item)}>Add Bid</a>
+        </div>
+
+        {renderTable item}
+
     |]
 
-renderBid bid = [hsx|
-    <!-- Reverse <li> as per https://stackoverflow.com/a/25695025/750039 -->
-    <li class="mt-4" style="transform: rotate(-180deg);">
-        <a href={EditBidAction (get #id bid)}>Edit Bid</a>
-        <div>Price: ${get #price bid}</div>
-        <div>Status: {get #status bid}</div>
-        <div>Type: {get #bidType bid}</div>
-        <div>{get #createdAt bid |> timeAgo}</div>
-    </li>
+
+renderTable item =
+    if null (get #bids item)
+        then
+            [hsx|
+                No Bids added yet
+            |]
+        else
+            [hsx|
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Type</th>
+                                <th>Time ago</th>
+                                <th>Ops</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {forEachWithIndex (get #bids item |> reverse) (renderBid (get #bids item |> length))}
+                        </tbody>
+                    </table>
+            |]
+
+
+
+renderBid totalBids (index, bid) = [hsx|
+    <tr>
+        <td>{totalBids - index}</td>
+        <td>${get #price bid}</td>
+        <td>{get #status bid}</td>
+        <td>{get #bidType bid}</td>
+        <td>{get #createdAt bid |> timeAgo}</td>
+        <td><a href={EditBidAction (get #id bid)}>Edit Bid</a></td>
+    </tr>
 |]
