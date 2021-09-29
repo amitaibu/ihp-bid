@@ -59,6 +59,6 @@ renderBid totalBids (index, bid) = [hsx|
         <td>{get #status bid}</td>
         <td>{get #bidType bid}</td>
         <td>{get #createdAt bid |> timeAgo}</td>
-        <td><a href={EditBidAction (get #id bid)}>Edit Bid</a></td>
+        <td><a href={EditBidAction (get #id bid)}>Edit</a></td>
     </tr>
 |]
