@@ -31,7 +31,7 @@ renderForm itemBids bid =
                     else ""
             }
         }
-        {selectField #bidType allBidType}
+        {selectField #bidType selectableBidType}
         {submitButton}
     |]
     where
@@ -39,7 +39,10 @@ renderForm itemBids bid =
             map (get #price) itemBids
                 |> maximum'
 
-        allBidType = allEnumValues @BidType
+        -- Auto-* bids are auto created, and cannot be created manually.
+        nonSelectableBidTypes = [AutoAgent, AutoMail]
+        selectableBidType = allEnumValues @BidType
+            |> filter (\x -> x `notElem` nonSelectableBidTypes)
 
 
 -- @todo: Remove duplication. Where to move?

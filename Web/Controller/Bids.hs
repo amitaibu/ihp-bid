@@ -15,6 +15,8 @@ instance Controller BidsController where
     action NewBidAction { itemId }= do
         let bid = newRecord
                 |> set #itemId itemId
+                -- Internet bid type by default.
+                |> set #bidType Internet
         item <- fetch itemId
         itemBids <- fetch (get #bids item)
         render NewView { .. }
@@ -67,8 +69,6 @@ instance Controller BidsController where
 buildBidCreate bid = bid
     |> fill @["itemId","status","price", "bidType"]
     |> validateField #price (isGreaterThan 0)
-    |> set #status Rejected
-    |> set #bidType Internet
     |> validateIsPriceAboveOtherBids
 
 buildBidUpdate bid = bid
@@ -76,18 +76,17 @@ buildBidUpdate bid = bid
 
 validateIsPriceAboveOtherBids bid = do
     item <- fetch (get #itemId bid)
+    mwinningBid <- getWinningBid item
 
-    bids <- fetch (get #bids item)
-    let prices = map (get #price) bids
-    let highestBidPrice = maximum' prices
-    bid
-        |> validateField #price (isGreaterThan highestBidPrice |> withCustomErrorMessage ("Price should be higher than the currently highest price: " ++ show highestBidPrice))
-        |> pure
-    where
-        maximum' :: (Num a, Ord a) => [a] -> a
-        maximum' [] = 0
-        maximum' xs = foldr1 (\x y ->if x >= y then x else y) xs
-
-
+    case mwinningBid of
+        Nothing ->
+            -- No winning bid.
+            pure bid
+        Just winningBid ->
+            bid
+                |> validateField #price (isGreaterThan price |> withCustomErrorMessage ("Price should be higher than the currently highest price: " ++ show price))
+                |> pure
+            where
+                price = get #price winningBid
 
 
