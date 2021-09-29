@@ -18,7 +18,7 @@ instance Controller ItemsController where
 
     action ShowItemAction { itemId } = autoRefresh do
         item <- fetch itemId
-            >>= pure . modify #bids (orderByDesc #createdAt)
+            >>= pure . modify #bids (orderBy #createdAt)
             >>= fetchRelated #bids
         render ShowView { .. }
 
