@@ -82,7 +82,7 @@ instance Controller BidsController where
                                                 |> set #itemId (get #itemId bid)
                                                 -- Internet bid type by default.
                                                 |> set #bidType AutoMail
-                                                |> set #price ((get #price winningBid) + 10)
+                                                |> set #price (get #price winningBid + 10)
                                                 |> createRecord
 
                                         Just mailBid
@@ -91,11 +91,6 @@ instance Controller BidsController where
                                         pure Nothing
 
                         pure ()
-
-
-
-
-
 
 
                     setSuccessMessage "Bid created"
