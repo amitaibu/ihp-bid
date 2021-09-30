@@ -107,7 +107,10 @@ instance Controller BidsController where
 buildBidCreate bid = bid
     |> fill @["itemId","status","price", "bidType"]
     |> validateField #price (isGreaterThan 0)
-    |> validateIsPriceAboveOtherBids
+    -- IO validations
+    |> validateType
+    >>= validateIsPriceAboveOtherBids
+
 
 buildBidUpdate bid = bid
     |> fill @'["status"]
@@ -128,3 +131,20 @@ validateIsPriceAboveOtherBids bid = do
                 price = get #price winningBid
 
 
+validateType bid = do
+    item <- fetch (get #itemId bid)
+    let bidType = get #bidType bid
+
+    let bidUpdated =
+            case get #status item of
+                Active ->
+                    if bidType `elem` [Mail, Agent]
+                        then bid |> attachFailure #bidType ("Item is active, so Bid cannot be of type " ++ show bidType)
+                        else bid
+
+                Inactive ->
+                    if bidType == Internet
+                        then bid |> attachFailure #bidType ("Item is Inactive, so Bid cannot be of type " ++ show bidType)
+                        else bid
+
+    pure bidUpdated
