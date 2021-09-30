@@ -56,9 +56,13 @@ instance Controller ItemsController where
 
     action DeleteItemAction { itemId } = do
         item <- fetch itemId
+        bids <- fetch (get #bids item)
+        accessDeniedUnless (null bids)
         deleteRecord item
         setSuccessMessage "Item deleted"
         redirectTo ItemsAction
+
+
 
 buildItem item = item
      |> fill @'["title", "status"]
