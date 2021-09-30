@@ -1,7 +1,7 @@
 module Web.View.Items.Index where
 import Web.View.Prelude
 
-data IndexView = IndexView { items :: [Item] }
+data IndexView = IndexView { items :: [Include "bids" Item] }
 
 instance View IndexView where
     html IndexView { .. } = [hsx|
@@ -16,6 +16,7 @@ instance View IndexView where
                 <thead>
                     <tr>
                         <th>Item</th>
+                        <th>Status</th>
                         <th></th>
                         <th></th>
                         <th></th>
@@ -27,12 +28,27 @@ instance View IndexView where
     |]
 
 
-renderItem :: Item -> Html
+renderItem :: Include "bids" Item -> Html
 renderItem item = [hsx|
     <tr>
         <td>{get #title item}</td>
+        <td>{get #status item}</td>
         <td><a href={ShowItemAction (get #id item)}>Show</a></td>
         <td><a href={EditItemAction (get #id item)} class="text-muted">Edit</a></td>
-        <td><a href={DeleteItemAction (get #id item)} class="js-delete text-muted">Delete</a></td>
+        <td>{renderDeleteItem item}</td>
     </tr>
 |]
+
+
+renderDeleteItem item =
+    if null (get #bids item)
+        then [hsx|
+            <a href={DeleteItemAction (get #id item)} class="js-delete text-muted">Delete</a>
+        |]
+        else
+        [hsx|
+            Item has {get #bids item |> length} Bid(s), so it cannot be deleted.
+        |]
+
+
+

@@ -9,7 +9,10 @@ import Web.View.Prelude (hsx)
 
 instance Controller ItemsController where
     action ItemsAction = do
-        items <- query @Item |> fetch
+        items <- query @Item
+                |> fetch
+                >>= collectionFetchRelated #bids
+
         render IndexView { .. }
 
     action NewItemAction = do
