@@ -108,6 +108,7 @@ instance Controller BidsController where
 
 
 
+buildBidCreate :: (?context::ControllerContext, ?modelContext::ModelContext) => Bid -> IO Bid
 buildBidCreate bid = do
     let bidFilled = bid |> fill @["itemId","status","price", "bidType"]
 
@@ -120,7 +121,7 @@ buildBidCreate bid = do
         |> validateIsPriceAboveOtherBids item
         |> pure
 
-
+buildBidUpdate :: (?context::ControllerContext, ?modelContext::ModelContext) => Bid -> Bid
 buildBidUpdate bid = bid
     |> fill @'["status"]
 
