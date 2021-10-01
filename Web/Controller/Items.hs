@@ -6,6 +6,8 @@ import Web.View.Items.New
 import Web.View.Items.Edit
 import Web.View.Items.Show
 import Web.View.Prelude (hsx)
+import qualified Data.TMap as TMap
+import Config
 
 instance Controller ItemsController where
     action ItemsAction = do
@@ -69,7 +71,6 @@ buildItem item = item
      |> validateField #title nonEmpty
 
 
-
 {-| Validate that no other Item is already Active.
 -}
 validateNoOtherActiveItem item = do
@@ -94,7 +95,11 @@ Inactive.
 
 
 validateNoRecentBid item = do
-    -- @todo: Get diff seconds from config.
+    let appConfig = ?context |> getFrameworkConfig |> get #appConfig
+    let (BidPreventItemSwitchToInactiveRecentBidDiffSeconds seconds) = appConfig
+               |> TMap.lookup @BidPreventItemSwitchToInactiveRecentBidDiffSeconds
+               |> fromMaybe (error "Could not find BidPreventItemSwitchToInactiveRecentBidDiffSeconds in config")
+
     let seconds = 20
     currentTime <- getCurrentTime
     originalItem <- fetch (get #id item)
