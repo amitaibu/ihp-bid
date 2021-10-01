@@ -66,6 +66,7 @@ instance Controller ItemsController where
 
 buildItem item = item
      |> fill @'["title", "status"]
+     |> validateField #title nonEmpty
 
 
 
