@@ -6,7 +6,7 @@ import Web.View.Bids.New
 import Web.View.Bids.Edit
 import Web.View.Bids.Show
 
-import Control.Concurrent ( forkIO )
+import Control.Concurrent ( forkIO, threadDelay )
 
 
 
@@ -78,12 +78,16 @@ instance Controller BidsController where
                             Just winningBid ->
                                 if get #bidType winningBid == Internet
                                     then do
+                                        threadDelay (2 * 1000000)
+
                                         mailBid <- newRecord @Bid
                                                 |> set #itemId (get #itemId bid)
                                                 -- Internet bid type by default.
                                                 |> set #bidType AutoMail
                                                 |> set #price (get #price winningBid + 10)
                                                 |> createRecord
+
+
 
                                         Just mailBid
                                             |> pure
@@ -104,47 +108,51 @@ instance Controller BidsController where
 
 
 
-buildBidCreate bid = bid
-    |> fill @["itemId","status","price", "bidType"]
-    |> validateField #price (isGreaterThan 0)
-    -- IO validations
-    |> validateType
-    >>= validateIsPriceAboveOtherBids
+buildBidCreate bid = do
+    let bidFilled = bid |> fill @["itemId","status","price", "bidType"]
+
+    item <- fetch (get #itemId bidFilled)
+            >>= pure . modify #bids (orderBy #createdAt)
+            >>= fetchRelated #bids
+
+    bidFilled
+        |> validateType item
+        |> validateIsPriceAboveOtherBids item
+        |> pure
 
 
 buildBidUpdate bid = bid
     |> fill @'["status"]
 
-validateIsPriceAboveOtherBids bid = do
-    item <- fetch (get #itemId bid)
-    bids <- fetch (get #bids item)
+validateIsPriceAboveOtherBids :: Include "bids" Item -> Bid -> Bid
+validateIsPriceAboveOtherBids item bid = do
+    let bids = get #bids item
 
     case getWinningBid bids of
         Nothing ->
-            -- No winning bid.
-            pure bid
+            -- No winning bid, so validate above 0.
+            bid
+                |> validateField #price (isGreaterThan 0)
         Just winningBid ->
             bid
                 |> validateField #price (isGreaterThan price |> withCustomErrorMessage ("Price should be higher than the currently highest price: " ++ show price))
-                |> pure
             where
                 price = get #price winningBid
 
 
-validateType bid = do
-    item <- fetch (get #itemId bid)
+validateType :: Include "bids" Item -> Bid -> Bid
+validateType item bid = do
     let bidType = get #bidType bid
 
-    let bidUpdated =
-            case get #status item of
-                Active ->
-                    if bidType `elem` [Mail, Agent]
-                        then bid |> attachFailure #bidType ("Item is active, so Bid cannot be of type " ++ show bidType)
-                        else bid
+    case get #status item of
+        Active ->
+            if bidType `elem` [Mail, Agent]
+                then bid |> attachFailure #bidType ("Item is active, so Bid cannot be of type " ++ show bidType)
+                else bid
 
-                Inactive ->
-                    if bidType == Internet
-                        then bid |> attachFailure #bidType ("Item is Inactive, so Bid cannot be of type " ++ show bidType)
-                        else bid
+        Inactive ->
+            if bidType == Internet
+                then bid |> attachFailure #bidType ("Item is Inactive, so Bid cannot be of type " ++ show bidType)
+                else bid
 
-    pure bidUpdated
+
