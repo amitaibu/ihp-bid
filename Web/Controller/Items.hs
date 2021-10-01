@@ -100,7 +100,6 @@ validateNoRecentBid item = do
                |> TMap.lookup @BidPreventItemSwitchToInactiveRecentBidDiffSeconds
                |> fromMaybe (error "Could not find BidPreventItemSwitchToInactiveRecentBidDiffSeconds in config")
 
-    let seconds = 20
     currentTime <- getCurrentTime
     originalItem <- fetch (get #id item)
     bids <- get #bids item
