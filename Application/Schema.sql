@@ -12,7 +12,8 @@ CREATE TABLE users (
 CREATE TABLE items (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY NOT NULL,
     title TEXT NOT NULL,
-    status item_status NOT NULL
+    status item_status NOT NULL,
+    bis_steps_id UUID[] DEFAULT '{}' NOT NULL
 );
 CREATE TABLE bids (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY NOT NULL,
@@ -23,4 +24,10 @@ CREATE TABLE bids (
     bid_type bid_type NOT NULL
 );
 CREATE INDEX bids_item_id_index ON bids (item_id);
+CREATE TABLE bid_steps (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY NOT NULL,
+    min INT NOT NULL,
+    max INT NOT NULL,
+    step INT NOT NULL
+);
 ALTER TABLE bids ADD CONSTRAINT bids_ref_item_id FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE NO ACTION;
