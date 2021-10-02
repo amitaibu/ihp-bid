@@ -78,7 +78,7 @@ instance Controller BidsController where
                             Just winningBid ->
                                 if get #bidType winningBid == Internet
                                     then do
-                                        threadDelay (2 * 1000000)
+                                        -- threadDelay (2 * 1000000)
 
                                         mailBid <- newRecord @Bid
                                                 |> set #itemId (get #itemId bid)
