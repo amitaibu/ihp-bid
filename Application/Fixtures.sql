@@ -23,10 +23,14 @@ ALTER TABLE public.bid_steps ENABLE TRIGGER ALL;
 
 ALTER TABLE public.items DISABLE TRIGGER ALL;
 
+
+
 ALTER TABLE public.items ENABLE TRIGGER ALL;
 
 
 ALTER TABLE public.bids DISABLE TRIGGER ALL;
+
+INSERT INTO public.items (id, title, status, bid_steps) VALUES ('d5032062-43b6-4f88-aea7-40a6c2e516df', '98ff9c09-55d8-4252-b010-5a6c36cb96a8', 'foo-title', 'active', '{}');
 
 ALTER TABLE public.bids ENABLE TRIGGER ALL;
 
