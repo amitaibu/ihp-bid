@@ -19,7 +19,7 @@ instance Controller ItemsController where
 
     action NewItemAction = do
         let item = newRecord
-        let bidSteps = take (paramOrDefault 2 "bidSteps") $ repeat $ newRecord @BidStep
+        let bidSteps = take (paramOrDefault 1 "bidSteps") $ repeat $ newRecord @BidStep
 
         render NewView { .. }
 
@@ -48,7 +48,7 @@ instance Controller ItemsController where
 
     action CreateItemAction = do
         let item = newRecord @Item
-        let bidSteps = take (paramOrDefault 2 "bidSteps") $ repeat $ newRecord @BidStep
+        let bidSteps = take (paramOrDefault 1 "bidSteps") $ repeat $ newRecord @BidStep
 
         item
             |> buildItem
@@ -60,14 +60,13 @@ instance Controller ItemsController where
                         let maxs :: [Int] = paramList "max"
                         let steps :: [Int] = paramList "max"
 
-                        let itemId = get #id item
 
                         let bidSteps = zip3 mins maxs steps
                                 |> map (\(min, max, step) -> newRecord @BidStep
-                                        |> set #itemId itemId
                                         |> set #min min
                                         |> set #max max
                                         |> set #step step
+                                        |> validateField #min (isGreaterThan 0)
                                         |> validateField #min (isGreaterThan 0)
                                         |> validateField #max (isGreaterThan 0)
                                         |> validateField #step (isGreaterThan 0)
@@ -78,7 +77,9 @@ instance Controller ItemsController where
                         case partitionEithers validatedBidSteps of
                             ([], bidSteps) -> do
                                 item <- item |> createRecord
-                                bidSteps <- createMany bidSteps
+                                let itemId = get #id item
+                                let bidStepsWithUpdatedItemId = map (\bidStep -> bidStep |> set #itemId itemId) bidSteps
+                                bidSteps <- createMany bidStepsWithUpdatedItemId
                                 setSuccessMessage "Item created"
 
                                 redirectTo ItemsAction
