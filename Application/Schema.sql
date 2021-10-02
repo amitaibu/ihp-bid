@@ -31,5 +31,5 @@ CREATE TABLE bids (
 );
 CREATE INDEX bids_item_id_index ON bids (item_id);
 CREATE INDEX bid_steps_item_id_index ON bid_steps (item_id);
-ALTER TABLE bid_steps ADD CONSTRAINT bid_steps_ref_item_id FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE NO ACTION;
+ALTER TABLE bid_steps ADD CONSTRAINT bid_steps_ref_item_id FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE;
 ALTER TABLE bids ADD CONSTRAINT bids_ref_item_id FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE NO ACTION;

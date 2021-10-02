@@ -77,6 +77,8 @@ instance Controller ItemsController where
                         case partitionEithers validatedBidSteps of
                             ([], bidSteps) -> do
                                 item <- item |> createRecord
+
+                                -- Set the Item reference on the Bid steps.
                                 let itemId = get #id item
                                 let bidStepsWithUpdatedItemId = map (\bidStep -> bidStep |> set #itemId itemId) bidSteps
                                 bidSteps <- createMany bidStepsWithUpdatedItemId
