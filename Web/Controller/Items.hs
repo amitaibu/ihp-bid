@@ -60,9 +60,11 @@ instance Controller ItemsController where
                         let maxs :: [Int] = paramList "max"
                         let steps :: [Int] = paramList "max"
 
+                        let itemId = get #id item
 
                         let bidSteps = zip3 mins maxs steps
                                 |> map (\(min, max, step) -> newRecord @BidStep
+                                        |> set #itemId itemId
                                         |> set #min min
                                         |> set #max max
                                         |> set #step step
@@ -75,14 +77,9 @@ instance Controller ItemsController where
 
                         case partitionEithers validatedBidSteps of
                             ([], bidSteps) -> do
+                                item <- item |> createRecord
                                 bidSteps <- createMany bidSteps
-                                let bidStepsIds = map (get #id) bidSteps
-                                item <- item
-                                        -- |> set #bidSteps "{}"
-                                        |> createRecord
                                 setSuccessMessage "Item created"
-
-
 
                                 redirectTo ItemsAction
 
