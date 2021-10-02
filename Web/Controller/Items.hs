@@ -78,7 +78,7 @@ instance Controller ItemsController where
                                 bidSteps <- createMany bidSteps
                                 let bidStepsIds = map (get #id) bidSteps
                                 item <- item
-                                        |> set #bidSteps bidStepsIds
+                                        -- |> set #bidSteps "{}"
                                         |> createRecord
                                 setSuccessMessage "Item created"
 
