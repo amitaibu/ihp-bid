@@ -1,7 +1,7 @@
 module Web.View.Items.New where
 import Web.View.Prelude
 
-data NewView = NewView { item :: Item }
+data NewView = NewView { item :: Item, bidSteps :: [BidStep] }
 
 instance View NewView where
     html NewView { .. } = [hsx|

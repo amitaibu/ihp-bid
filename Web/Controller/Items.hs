@@ -19,6 +19,8 @@ instance Controller ItemsController where
 
     action NewItemAction = do
         let item = newRecord
+        let bidSteps = take (paramOrDefault 2 "bidSteps") $ repeat $ newRecord @BidStep
+
         render NewView { .. }
 
     action ShowItemAction { itemId } = autoRefresh do
@@ -46,15 +48,43 @@ instance Controller ItemsController where
 
     action CreateItemAction = do
         let item = newRecord @Item
+        let bidSteps = take (paramOrDefault 2 "bidSteps") $ repeat $ newRecord @BidStep
+
         item
             |> buildItem
             |> set #status Inactive
             |> ifValid \case
                 Left item -> render NewView { .. }
                 Right item -> do
-                    item <- item |> createRecord
-                    setSuccessMessage "Item created"
-                    redirectTo ItemsAction
+                        let mins :: [Int] = paramList "min"
+                        let maxs :: [Int] = paramList "max"
+                        let steps :: [Int] = paramList "max"
+
+
+                        let bidSteps = zip3 mins maxs steps
+                                |> map (\(min, max, step) -> newRecord @BidStep
+                                        |> set #min min
+                                        |> set #max max
+                                        |> set #step step
+                                        |> validateField #min (isGreaterThan 0)
+                                        |> validateField #max (isGreaterThan 0)
+                                        |> validateField #step (isGreaterThan 0)
+                                    )
+
+                        validatedBidSteps :: [Either BidStep BidStep] <- forM bidSteps (ifValid (\bidStep -> pure bidStep))
+
+                        case partitionEithers validatedBidSteps of
+                            ([], bidSteps) -> do
+                                item <- item |> createRecord
+                                setSuccessMessage "Item created"
+
+
+                                createMany bidSteps
+                                redirectTo ItemsAction
+
+                            (invalidBidSteps, validBidSteps) -> render NewView {..}
+
+
 
     action DeleteItemAction { itemId } = do
         item <- fetch itemId
