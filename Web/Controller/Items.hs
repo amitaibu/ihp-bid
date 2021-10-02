@@ -75,11 +75,15 @@ instance Controller ItemsController where
 
                         case partitionEithers validatedBidSteps of
                             ([], bidSteps) -> do
-                                item <- item |> createRecord
+                                bidSteps <- createMany bidSteps
+                                let bidStepsIds = map (get #id) bidSteps
+                                item <- item
+                                        |> set #bidSteps bidStepsIds
+                                        |> createRecord
                                 setSuccessMessage "Item created"
 
 
-                                createMany bidSteps
+
                                 redirectTo ItemsAction
 
                             (invalidBidSteps, validBidSteps) -> render NewView {..}

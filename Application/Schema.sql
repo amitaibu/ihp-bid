@@ -13,7 +13,7 @@ CREATE TABLE items (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY NOT NULL,
     title TEXT NOT NULL,
     status item_status NOT NULL,
-    bis_steps_id UUID[] DEFAULT '{}' NOT NULL
+    bis_steps UUID[] DEFAULT '{}' NOT NULL
 );
 CREATE TABLE bids (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY NOT NULL,

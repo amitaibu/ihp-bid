@@ -14,21 +14,18 @@ SET row_security = off;
 
 SET SESSION AUTHORIZATION DEFAULT;
 
-ALTER TABLE public.items DISABLE TRIGGER ALL;
-
-INSERT INTO public.items (id, title, status) VALUES ('98ff9c09-55d8-4252-b010-5a6c36cb96a8', 'bar', 'inactive');
-INSERT INTO public.items (id, title, status) VALUES ('80b192f9-d803-4817-a512-1be5ec7a08cb', '123', 'inactive');
-INSERT INTO public.items (id, title, status) VALUES ('5600c837-4ca0-4352-aa1c-7495448e46e2', 'foo', 'inactive');
-
-
-ALTER TABLE public.items ENABLE TRIGGER ALL;
-
-
 ALTER TABLE public.bid_steps DISABLE TRIGGER ALL;
 
 
 
 ALTER TABLE public.bid_steps ENABLE TRIGGER ALL;
+
+
+ALTER TABLE public.items DISABLE TRIGGER ALL;
+
+
+
+ALTER TABLE public.items ENABLE TRIGGER ALL;
 
 
 ALTER TABLE public.bids DISABLE TRIGGER ALL;

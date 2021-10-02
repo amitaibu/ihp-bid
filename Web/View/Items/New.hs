@@ -19,18 +19,19 @@ renderForm :: Item -> [BidStep] -> Html
 renderForm item bidSteps = formFor item [hsx|
     {(textField #title)}
 
-    {forEach bidSteps renderFormBidStep}
+    {forEachWithIndex bidSteps renderFormBidStep}
 
     {submitButton}
 |]
 
 -- renderFormBidStep :: BidStep -> Html
-renderFormBidStep bidStep = [hsx|
+renderFormBidStep (index, bidStep) = [hsx|
+    <h3>Bid Step #{index + 1}</h3>
     <div class="form-group">
         <label>
             Min
         </label>
-        <input type="number" name="min" value={get #min bidStep} class={classes ["form-control", ("is-invalid", isInvalidMin)]}/>
+        <input type="number" name="min" value="{get #min bidStep}" class={classes ["form-control", ("is-invalid", isInvalidMin)]}/>
         {minFeedback}
     </div>
 
@@ -38,7 +39,7 @@ renderFormBidStep bidStep = [hsx|
         <label>
             Max
         </label>
-        <input type="number" name="max" value={get #max bidStep} class={classes ["form-control", ("is-invalid", isInvalidMax)]}/>
+        <input type="number" name="max" value="{get #max bidStep}" class={classes ["form-control", ("is-invalid", isInvalidMax)]}/>
         {maxFeedback}
     </div>
 
@@ -46,7 +47,7 @@ renderFormBidStep bidStep = [hsx|
         <label>
             Step
         </label>
-        <input type="number" name="max" value={get #step bidStep} class={classes ["form-control", ("is-invalid", isInvalidStep)]}/>
+        <input type="number" name="max" value="{get #step bidStep}" class={classes ["form-control", ("is-invalid", isInvalidStep)]}/>
         {stepFeedback}
     </div>
 |]
