@@ -1,7 +1,8 @@
 module Web.View.Items.Show where
 import Web.View.Prelude
 
-data ShowView = ShowView { item :: Include "bids" Item }
+data ShowView = ShowView
+    { item :: Include "bids" (Include "bidSteps" Item) }
 
 instance View ShowView where
     html ShowView { .. } = [hsx|
@@ -20,12 +21,14 @@ instance View ShowView where
             <a class="btn btn-primary mb-4" href={NewBidAction (get #id item)}>Add Bid</a>
         </div>
 
-        {renderTable item}
+        {renderBidsTable item}
+
+        {renderBidStepsTable item}
 
     |]
 
 
-renderTable item =
+renderBidsTable item =
     if null (get #bids item)
         then
             [hsx|
@@ -62,3 +65,38 @@ renderBid totalBids (index, bid) = [hsx|
         <td><a href={EditBidAction (get #id bid)}>Edit</a></td>
     </tr>
 |]
+
+
+renderBidStepsTable item =
+    if null (get #bidSteps item)
+        then
+            [hsx|
+                No Bid Steps added yet
+            |]
+        else
+            [hsx|
+                    <h3>Bid Steps</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Min</th>
+                                <th>Max</th>
+                                <th>Step</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {forEachWithIndex (get #bidSteps item) renderBidStep}
+                        </tbody>
+                    </table>
+            |]
+
+renderBidStep (index, bidStep) = [hsx|
+    <tr>
+        <td>{index + 1}</td>
+        <td>{get #min bidStep}</td>
+        <td>{get #max bidStep}</td>
+        <td>{get #step bidStep}</td>
+    </tr>
+|]
+

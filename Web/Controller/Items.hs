@@ -27,6 +27,8 @@ instance Controller ItemsController where
         item <- fetch itemId
             >>= pure . modify #bids (orderBy #createdAt)
             >>= fetchRelated #bids
+            >>= fetchRelated #bidSteps
+
         render ShowView { .. }
 
     action EditItemAction { itemId } = do
