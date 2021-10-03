@@ -133,6 +133,7 @@ validateType item bid = do
 
 
 
+createMailBid :: (?modelContext::ModelContext) => Bid -> IO ()
 createMailBid bid = do
     item <- fetch (get #itemId bid)
     itemBids <- fetch (get #bids item)
