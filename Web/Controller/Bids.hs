@@ -70,32 +70,7 @@ instance Controller BidsController where
                 Right bid -> do
                     bid <- bid |> createRecord
 
-                    _ <- forkIO $ do
-                        item <- fetch (get #itemId bid)
-                        itemBids <- fetch (get #bids item)
-                        mMailBid <- case getWinningBid itemBids of
-                            Nothing -> pure Nothing
-                            Just winningBid ->
-                                if get #bidType winningBid == Internet
-                                    then do
-                                        -- threadDelay (2 * 1000000)
-
-                                        mailBid <- newRecord @Bid
-                                                |> set #itemId (get #itemId bid)
-                                                -- Internet bid type by default.
-                                                |> set #bidType AutoMail
-                                                |> set #price (get #price winningBid + 10)
-                                                |> createRecord
-
-
-
-                                        Just mailBid
-                                            |> pure
-                                    else
-                                        pure Nothing
-
-                        pure ()
-
+                    forkIO $ createMailBid bid
 
                     setSuccessMessage "Bid created"
                     redirectTo (ShowItemAction (get #itemId bid))
@@ -157,3 +132,31 @@ validateType item bid = do
                 else bid
 
 
+
+createMailBid :: (?modelContext::ModelContext) => Bid -> IO ()
+createMailBid bid = do
+    item <- fetch (get #itemId bid)
+    itemBids <- fetch (get #bids item)
+    mMailBid <- case getWinningBid itemBids of
+        Nothing -> pure Nothing
+        Just winningBid ->
+            if get #bidType winningBid == Internet || get #price winningBid < 500
+                then do
+                    -- threadDelay (2 * 1000000)
+
+                    mailBid <- newRecord @Bid
+                            |> set #itemId (get #itemId bid)
+                            -- Internet bid type by default.
+                            |> set #bidType AutoMail
+                            |> set #price (get #price winningBid + 10)
+                            |> createRecord
+
+
+                    forkIO $ createMailBid mailBid
+
+                    Just mailBid
+                        |> pure
+                else
+                    pure Nothing
+
+    pure ()
