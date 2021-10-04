@@ -152,7 +152,7 @@ createMailBid bid = do
                             |> createRecord
 
 
-                    forkIO $ createMailBid mailBid
+                    createMailBid mailBid
 
                     Just mailBid
                         |> pure
