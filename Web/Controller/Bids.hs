@@ -154,8 +154,7 @@ createMailBid bid = do
 
                     createMailBid mailBid
 
-                    Just mailBid
-                        |> pure
+                    Just mailBid |> pure
                 else
                     pure Nothing
 
