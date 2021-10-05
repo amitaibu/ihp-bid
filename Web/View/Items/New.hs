@@ -22,18 +22,24 @@ renderForm :: Item -> [BidStep] -> Html
 renderForm item bidSteps = formFor item [hsx|
     {(textField #title)}
 
-    <fieldset class="multiple-field-wrapper border p-4">
-        {forEachWithIndex bidSteps renderFormBidStep}
+    <div class="multiple-field-wrapper border p-4 my-4">
+
+        <div class="multiple-field-inner">
+            {forEachWithIndex bidSteps renderFormBidStep}
+
+        </div>
+
+
 
         <div class="multiple-field-add btn btn-secondary mt-4">Add Another Bid Step</div>
-    </fieldset>
+    </div>
 
     {submitButton}
 |]
 
 -- renderFormBidStep :: BidStep -> Html
 renderFormBidStep (index, bidStep) = [hsx|
-    <fieldset class="multiple-field border p-4">
+    <fieldset class="multiple-field border p-4 my-4">
         <h3>Bid Step</h3>
         <div class="form-group">
             <label>
