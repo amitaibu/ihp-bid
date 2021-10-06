@@ -59,7 +59,27 @@ instance Controller BidsController where
                     redirectTo (ShowItemAction (get #itemId bid))
 
     action CreateBidAction = do
+
+        -- Get global queue
+        queue <- newTBQueueIO 100
+
         let bid = newRecord @Bid
+
+        -- Add Bid to queue.
+
+        mailbox <- newEmptyMVar
+
+
+        -- Wait for queue to return the processed Bid.
+        -- Queue should also populate the mailbox, so we'd know when it's done processing our Bid.
+        atomically $ writeTBQueue queue (bid, mailbox)
+
+        receivedBid <- takeMvar mailbox
+
+        -- Return the response.
+
+
+
         bid
             |> buildBidCreate
             >>= ifValid \case
