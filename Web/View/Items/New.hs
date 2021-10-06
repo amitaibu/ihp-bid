@@ -49,7 +49,9 @@ renderFormBidStep (index, bidStep) = [hsx|
             <label>
                 Min
             </label>
-            <input type="number" name="min" value="{get #min bidStep}" class={classes ["form-control", ("is-invalid", isInvalidMin)]}/>
+            <input type="number" name="min"
+            value={if didChange #min bidStep then inputValue (get #min bidStep) else ""}
+            class={classes ["form-control", ("is-invalid", isInvalidMin)]}/>
             {minFeedback}
         </div>
 
@@ -57,7 +59,9 @@ renderFormBidStep (index, bidStep) = [hsx|
             <label>
                 Max
             </label>
-            <input type="number" name="max" value="{get #max bidStep}" class={classes ["form-control", ("is-invalid", isInvalidMax)]}/>
+            <input type="number" name="max"
+            value={if didChange #max bidStep then inputValue (get #max bidStep) else ""}
+            class={classes ["form-control", ("is-invalid", isInvalidMax)]}/>
             {maxFeedback}
         </div>
 
@@ -65,7 +69,9 @@ renderFormBidStep (index, bidStep) = [hsx|
             <label>
                 Step
             </label>
-            <input type="number" name="max" value="{get #step bidStep}" class={classes ["form-control", ("is-invalid", isInvalidStep)]}/>
+            <input type="number" name="max"
+            value={if didChange #step bidStep then inputValue (get #step bidStep) else ""}
+            class={classes ["form-control", ("is-invalid", isInvalidStep)]}/>
             {stepFeedback}
         </div>
     </fieldset>
