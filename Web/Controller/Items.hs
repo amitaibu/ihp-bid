@@ -12,7 +12,7 @@ import Config
 instance Controller ItemsController where
     action ItemsAction = do
         items <- query @Item
-                |> orderByDesc #id
+                |> orderByDesc #createdAt
                 |> fetch
                 >>= collectionFetchRelated #bids
 

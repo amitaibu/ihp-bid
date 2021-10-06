@@ -19,7 +19,8 @@ CREATE TABLE users (
 CREATE TABLE items (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY NOT NULL,
     title TEXT NOT NULL,
-    status item_status NOT NULL
+    status item_status NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
 );
 CREATE TABLE bids (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY NOT NULL,
