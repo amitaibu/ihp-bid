@@ -40,7 +40,11 @@ renderForm item bidSteps = formFor item [hsx|
 -- renderFormBidStep :: BidStep -> Html
 renderFormBidStep (index, bidStep) = [hsx|
     <fieldset class="multiple-field border p-4 my-4">
-        <h3>Bid Step</h3>
+        <div class="d-flex flex-row justify-content-between">
+            <h3>Bid Step</h3>
+            <a class="multiple-field-remove" href="javascript:void(0)">X</a>
+        </div>
+
         <div class="form-group">
             <label>
                 Min
