@@ -133,9 +133,8 @@ Inactive.
 
 validateNoRecentBid item = do
     let appConfig = ?context |> getFrameworkConfig |> get #appConfig
-    let (BidPreventItemSwitchToInactiveRecentBidDiffSeconds seconds) = appConfig
-               |> TMap.lookup @BidPreventItemSwitchToInactiveRecentBidDiffSeconds
-               |> fromMaybe (error "Could not find BidPreventItemSwitchToInactiveRecentBidDiffSeconds in config")
+    -- @todo: Move to Env variables.
+    let seconds = 5
 
     currentTime <- getCurrentTime
     originalItem <- fetch (get #id item)
