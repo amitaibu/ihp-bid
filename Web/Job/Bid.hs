@@ -37,8 +37,10 @@ instance Job BidJob where
                             |> set #status Accepted
                             |> updateRecord
 
-                    -- Trigger pre-registered bids.
-                    triggerPreRegisteredBid bid
+                    case get #bidType bid of
+                        Mail -> pure ()
+                        -- Trigger pre-registered bids.
+                        _ -> triggerPreRegisteredBid bid
 
         pure ()
 

@@ -55,7 +55,6 @@ instance Controller ItemsController where
 
         item
             |> buildItem
-            |> set #status Active
             |> ifValid \case
                 Left item -> render NewView { .. }
                 Right item -> do

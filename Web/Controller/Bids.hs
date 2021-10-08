@@ -17,11 +17,15 @@ instance Controller BidsController where
             fetch itemId
                 >>= fetchRelated #bids
 
+        let bidType =
+                case get #status item of
+                    Active -> Internet
+                    _ -> Mail
+
         let bid' =
                 newRecord
                     |> set #itemId itemId
-                    -- Internet bid type by default.
-                    |> set #bidType Internet
+                    |> set #bidType bidType
                     -- Default opening price
                     |> set #price 10
 
