@@ -58,33 +58,20 @@ instance Controller BidsController where
                     setSuccessMessage "Bid updated"
                     redirectTo (ShowItemAction (get #itemId bid))
 
-action CreateBidAction = do
-    bid <- newRecord @Bid
-        |> fill @["itemId","status","price", "bidType"]
-        |> create
+    action CreateBidAction = do
+        bid <- newRecord @Bid
+            |> fill @["itemId", "price", "bidType"]
+            |> set #status Queued
+            |> create
 
-    -- Create the Job.
-    newRecord @BidJob
-        |> set #bidId (get #id bid)
-        |> create
+        -- Create the Job.
+        newRecord @BidJob
+            |> set #bidId (get #id bid)
+            |> create
 
-    setSuccessMessage "Bid Queued"
-    redirectTo (ShowItemAction (get #itemId bid))
+        setSuccessMessage $ "Bid Queued " ++ show (get #id bid)
+        redirectTo (ShowItemAction (get #itemId bid))
 
-        bid
-            |> buildBidCreate
-            >>= ifValid \case
-                Left bid -> do
-                    item <- fetch (get #itemId bid)
-                    itemBids <- fetch (get #bids item)
-                    render NewView { .. }
-                Right bid -> do
-                    bid <- bid |> createRecord
-
-                    forkIO $ createMailBid bid
-
-                    setSuccessMessage "Bid Queued"
-                    redirectTo (ShowItemAction (get #itemId bid))
 
     action DeleteBidAction { bidId } = do
         bid <- fetch bidId
@@ -93,17 +80,6 @@ action CreateBidAction = do
         redirectTo (ShowItemAction (get #itemId bid))
 
 
-
-buildBidCreate :: (?context::ControllerContext, ?modelContext::ModelContext) => Bid -> IO Bid
-buildBidCreate bid = do
-    item <- fetch (get #itemId bidFilled)
-            >>= pure . modify #bids (orderBy #createdAt)
-            >>= fetchRelated #bids
-
-    bid
-        |> validateType item
-        |> validateIsPriceAboveOtherBids item
-        |> pure
 
 buildBidUpdate :: (?context::ControllerContext, ?modelContext::ModelContext) => Bid -> Bid
 buildBidUpdate bid = bid

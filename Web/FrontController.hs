@@ -10,11 +10,13 @@ import Web.Controller.Items
 import IHP.LoginSupport.Middleware
 import Web.Controller.Sessions
 import Web.Controller.Users
+import IHP.Job.Dashboard
 
 instance FrontController WebApplication where
     controllers =
         [ startPage ItemsAction
         , parseRoute @SessionsController
+        , parseRoute @MyJobDashboard
         -- Generator Marker
         , parseRoute @BidsController
         , parseRoute @ItemsController
@@ -27,3 +29,6 @@ instance InitControllerContext WebApplication where
         initAutoRefresh
         initAuthentication @User
 
+
+type MyJobDashboard = JobsDashboardController
+    NoAuth '[]
