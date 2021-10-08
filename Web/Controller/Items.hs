@@ -87,7 +87,7 @@ instance Controller ItemsController where
                                 bidSteps <- createMany bidStepsWithUpdatedItemId
                                 setSuccessMessage "Item created"
 
-                                redirectTo ItemsAction
+                                redirectTo $ ShowItemAction itemId
 
                             (invalidBidSteps, validBidSteps) -> render NewView {..}
 
