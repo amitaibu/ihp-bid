@@ -59,10 +59,12 @@ validateIsPriceAboveOtherBids item bid = do
             bid
                 |> validateField #price (isGreaterThan 0)
         Just winningBid ->
-            bid
-                |> validateField #price (isGreaterThan price |> withCustomErrorMessage "Price too low")
-            where
-                price = get #price winningBid
+            -- Make sure we don't validate against self Bid.
+            if get #id winningBid == get #id bid
+                then bid
+                else bid |> validateField #price (isGreaterThan price |> withCustomErrorMessage "Price too low")
+                    where
+                        price = get #price winningBid
 
 
 validateType :: Include "bids" Item -> Bid -> Bid
@@ -83,27 +85,28 @@ validateType item bid = do
 
 triggerPreRegisteredBid :: (?modelContext::ModelContext) => Bid -> IO ()
 triggerPreRegisteredBid bid = do
-    item <- fetch (get #itemId bid)
-    itemBids <- fetch (get #bids item)
-    mMailBid <- case getWinningBid itemBids of
-        Nothing -> pure Nothing
-        Just winningBid ->
-            if get #bidType winningBid == Internet || get #price winningBid < 500
-                then do
-                    -- threadDelay (2 * 1000000)
-
-                    mailBid <- newRecord @Bid
-                            |> set #itemId (get #itemId bid)
-                            -- Internet bid type by default.
-                            |> set #bidType AutoMail
-                            |> set #price (get #price winningBid + 10)
-                            |> createRecord
-
-
-                    triggerPreRegisteredBid mailBid
-
-                    Just mailBid |> pure
-                else
-                    pure Nothing
-
     pure ()
+    -- item <- fetch (get #itemId bid)
+    -- itemBids <- fetch (get #bids item)
+    -- mMailBid <- case getWinningBid itemBids of
+    --     Nothing -> pure Nothing
+    --     Just winningBid ->
+    --         if get #bidType winningBid == Internet || get #price winningBid < 500
+    --             then do
+    --                 -- threadDelay (2 * 1000000)
+
+    --                 mailBid <- newRecord @Bid
+    --                         |> set #itemId (get #itemId bid)
+    --                         -- Internet bid type by default.
+    --                         |> set #bidType AutoMail
+    --                         |> set #price (get #price winningBid + 10)
+    --                         |> createRecord
+
+
+    --                 triggerPreRegisteredBid mailBid
+
+    --                 Just mailBid |> pure
+    --             else
+    --                 pure Nothing
+
+    -- pure ()

@@ -23,6 +23,8 @@ instance Controller BidsController where
                 |> set #itemId itemId
                 -- Internet bid type by default.
                 |> set #bidType Internet
+                -- Default opening price
+                |> set #price 10
 
         let bid =
                 case getWinningBid itemBids of
@@ -92,11 +94,13 @@ getWinningBid bids = do
         xs -> foldr (\bid accum ->
             case accum of
                 Nothing ->
-                    Just bid
+                    if get #status bid /= Accepted
+                        then accum
+                        else Just bid
                 Just highestBid ->
                     if get #status highestBid /= Accepted  || get #price bid > get #price highestBid then
                         -- Skip any non accepted items, or Bids with lower price.
-                        Just bid
+                        accum
                     else
                         Just highestBid
             ) Nothing xs
