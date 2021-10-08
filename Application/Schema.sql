@@ -1,5 +1,5 @@
 -- Your database schema. Use the Schema Designer at http://localhost:8001/ to add some tables.
-CREATE TYPE bid_status AS ENUM ('accepted', 'rejected', 'queued');
+CREATE TYPE bid_status AS ENUM ('accepted', 'rejected', 'queued', 'rejected_low_price');
 CREATE TYPE bid_type AS ENUM ('mail', 'auto_mail', 'internet', 'agent', 'auto_agent');
 CREATE TYPE item_status AS ENUM ('active', 'inactive');
 CREATE TABLE bid_steps (
