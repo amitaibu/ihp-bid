@@ -32,10 +32,9 @@ instance Job BidJob where
 
                     pure ()
                 Right bid -> do
-                    bid <-
-                        bid
-                            |> set #status Accepted
-                            |> updateRecord
+                    bid
+                        |> set #status Accepted
+                        |> updateRecord
 
                     case get #bidType bid of
                         Mail -> pure ()
@@ -60,7 +59,7 @@ triggerPreRegisteredBid bid = do
         Just winningBid ->
             if get #bidType winningBid == Internet || get #price winningBid < 500
                 then do
-                    -- threadDelay (2 * 1000000)
+                    threadDelay (2 * 1000000)
 
                     triggeredBid <-
                         newRecord @Bid
