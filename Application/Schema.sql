@@ -41,6 +41,7 @@ CREATE TABLE bid_jobs (
     attempts_count INT DEFAULT 0 NOT NULL,
     locked_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
     locked_by UUID DEFAULT NULL,
+    run_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
     bid_id UUID NOT NULL
 );
 CREATE INDEX bid_jobs_bid_id_index ON bid_jobs (bid_id);
