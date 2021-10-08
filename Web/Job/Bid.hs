@@ -30,11 +30,16 @@ instance Job BidJob where
                     |>set #status status
                     |> updateRecord
 
+                -- Trigger pre-registered bids.
+                triggerPreRegisteredBid bid
+
 
             Right bid -> do
                 bid
                     |>set #status Accepted
                     |> updateRecord
+
+                pure ()
 
         pure ()
 
@@ -76,8 +81,8 @@ validateType item bid = do
                 else bid
 
 
-createMailBid :: (?modelContext::ModelContext) => Bid -> IO ()
-createMailBid bid = do
+triggerPreRegisteredBid :: (?modelContext::ModelContext) => Bid -> IO ()
+triggerPreRegisteredBid bid = do
     item <- fetch (get #itemId bid)
     itemBids <- fetch (get #bids item)
     mMailBid <- case getWinningBid itemBids of
@@ -95,7 +100,7 @@ createMailBid bid = do
                             |> createRecord
 
 
-                    createMailBid mailBid
+                    triggerPreRegisteredBid mailBid
 
                     Just mailBid |> pure
                 else
