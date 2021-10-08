@@ -1,6 +1,6 @@
 module Web.View.Items.Show where
 import Web.View.Prelude
-import Web.Controller.Bids
+import Web.Controller.Bids ( getWinningBid )
 
 data ShowView = ShowView
     { item :: Include "bids" (Include "bidSteps" Item) }
@@ -23,7 +23,7 @@ instance View ShowView where
         </div>
 
         <div>
-            Current winning Bid:  {show $ getWinningBid (get #bids item)}
+            Current winning Bid: {show $ getWinningBid (get #bids item)}
         </div>
 
         {renderBidsTable item}

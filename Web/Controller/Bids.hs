@@ -61,18 +61,32 @@ instance Controller BidsController where
                     redirectTo (ShowItemAction (get #itemId bid))
 
     action CreateBidAction = do
-        bid <- newRecord @Bid
-            |> fill @["itemId", "price", "bidType"]
-            |> set #status Queued
-            |> create
+        let bid = newRecord @Bid
+                |> fill @["itemId", "price", "bidType"]
+                |> set #status Queued
 
-        -- Create the Job.
-        newRecord @BidJob
-            |> set #bidId (get #id bid)
-            |> create
+        item <- fetch (get #itemId bid)
+                >>= pure . modify #bids (orderBy #createdAt)
+                >>= fetchRelated #bids
 
-        setSuccessMessage $ "Bid Queued " ++ show (get #id bid)
-        redirectTo (ShowItemAction (get #itemId bid))
+        bid
+            |> validateType item
+            |> ifValid \case
+                Left bid -> do
+                    item <- fetch (get #itemId bid)
+                    itemBids <- fetch (get #bids item)
+                    render NewView { .. }
+
+                Right bid -> do
+                    bid |> create
+
+                    -- Create a Job for the Bid to be processed.
+                    newRecord @BidJob
+                        |> set #bidId (get #id bid)
+                        |> create
+
+                    setSuccessMessage $ "Bid registered"
+                    redirectTo (ShowItemAction (get #itemId bid))
 
 
     action DeleteBidAction { bidId } = do
@@ -82,6 +96,21 @@ instance Controller BidsController where
         redirectTo (ShowItemAction (get #itemId bid))
 
 
+
+validateType :: Include "bids" Item -> Bid -> Bid
+validateType item bid = do
+    let bidType = get #bidType bid
+
+    case get #status item of
+        Active ->
+            if bidType `elem` [Mail, Agent]
+                then bid |> attachFailure #bidType ("Item is active, so Bid cannot be of type " ++ show bidType)
+                else bid
+
+        Inactive ->
+            if bidType == Internet
+                then bid |> attachFailure #bidType ("Item is Inactive, so Bid cannot be of type " ++ show bidType)
+                else bid
 
 buildBidUpdate :: (?context::ControllerContext, ?modelContext::ModelContext) => Bid -> Bid
 buildBidUpdate bid = bid
