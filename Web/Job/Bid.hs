@@ -4,3 +4,5 @@ import Web.Controller.Prelude
 instance Job BidJob where
     perform BidJob { .. } = do
         putStrLn "Hello World!"
+
+    maxAttempts = 1

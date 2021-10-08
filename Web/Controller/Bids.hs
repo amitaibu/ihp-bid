@@ -58,8 +58,19 @@ instance Controller BidsController where
                     setSuccessMessage "Bid updated"
                     redirectTo (ShowItemAction (get #itemId bid))
 
-    action CreateBidAction = do
-        let bid = newRecord @Bid
+action CreateBidAction = do
+    bid <- newRecord @Bid
+        |> fill @["itemId","status","price", "bidType"]
+        |> create
+
+    -- Create the Job.
+    newRecord @BidJob
+        |> set #bidId (get #id bid)
+        |> create
+
+    setSuccessMessage "Bid Queued"
+    redirectTo (ShowItemAction (get #itemId bid))
+
         bid
             |> buildBidCreate
             >>= ifValid \case
@@ -72,7 +83,7 @@ instance Controller BidsController where
 
                     forkIO $ createMailBid bid
 
-                    setSuccessMessage "Bid created"
+                    setSuccessMessage "Bid Queued"
                     redirectTo (ShowItemAction (get #itemId bid))
 
     action DeleteBidAction { bidId } = do
@@ -85,13 +96,11 @@ instance Controller BidsController where
 
 buildBidCreate :: (?context::ControllerContext, ?modelContext::ModelContext) => Bid -> IO Bid
 buildBidCreate bid = do
-    let bidFilled = bid |> fill @["itemId","status","price", "bidType"]
-
     item <- fetch (get #itemId bidFilled)
             >>= pure . modify #bids (orderBy #createdAt)
             >>= fetchRelated #bids
 
-    bidFilled
+    bid
         |> validateType item
         |> validateIsPriceAboveOtherBids item
         |> pure

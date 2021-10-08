@@ -75,7 +75,8 @@ renderBidStepsTable item =
             |]
         else
             [hsx|
-                    <h3>Bid Steps</h3>
+                <details>
+                    <summary>Bid Steps</summary>
                     <table class="table">
                         <thead>
                             <tr>
@@ -89,6 +90,7 @@ renderBidStepsTable item =
                             {forEachWithIndex (get #bidSteps item) renderBidStep}
                         </tbody>
                     </table>
+                </details>
             |]
 
 renderBidStep (index, bidStep) = [hsx|

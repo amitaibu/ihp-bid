@@ -1,5 +1,5 @@
 -- Your database schema. Use the Schema Designer at http://localhost:8001/ to add some tables.
-CREATE TYPE bid_status AS ENUM ('accepted', 'rejected');
+CREATE TYPE bid_status AS ENUM ('accepted', 'rejected', 'queued');
 CREATE TYPE bid_type AS ENUM ('mail', 'auto_mail', 'internet', 'agent', 'auto_agent');
 CREATE TYPE item_status AS ENUM ('active', 'inactive');
 CREATE TABLE bid_steps (
@@ -32,8 +32,6 @@ CREATE TABLE bids (
 );
 CREATE INDEX bids_item_id_index ON bids (item_id);
 CREATE INDEX bid_steps_item_id_index ON bid_steps (item_id);
-ALTER TABLE bid_steps ADD CONSTRAINT bid_steps_ref_item_id FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE;
-ALTER TABLE bids ADD CONSTRAINT bids_ref_item_id FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE NO ACTION;
 CREATE TABLE bid_jobs (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
@@ -42,5 +40,10 @@ CREATE TABLE bid_jobs (
     last_error TEXT DEFAULT NULL,
     attempts_count INT DEFAULT 0 NOT NULL,
     locked_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
-    locked_by UUID DEFAULT NULL
+    locked_by UUID DEFAULT NULL,
+    bid_id UUID NOT NULL
 );
+CREATE INDEX bid_jobs_bid_id_index ON bid_jobs (bid_id);
+ALTER TABLE bid_jobs ADD CONSTRAINT bid_jobs_ref_bid_id FOREIGN KEY (bid_id) REFERENCES bids (id) ON DELETE NO ACTION;
+ALTER TABLE bid_steps ADD CONSTRAINT bid_steps_ref_item_id FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE;
+ALTER TABLE bids ADD CONSTRAINT bids_ref_item_id FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE NO ACTION;
