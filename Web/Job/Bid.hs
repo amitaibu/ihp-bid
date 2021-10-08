@@ -45,8 +45,8 @@ instance Job BidJob where
 
     maxAttempts = 1
 
-    -- Max 2 seconds to process each Bid.
-    timeoutInMicroseconds = Just $ 1000000 * 2
+    -- Max 3 seconds to process each Bid.
+    timeoutInMicroseconds = Just $ 1000000 * 3
 
 triggerPreRegisteredBid :: (?modelContext :: ModelContext) => Bid -> IO ()
 triggerPreRegisteredBid bid = do
@@ -59,7 +59,7 @@ triggerPreRegisteredBid bid = do
         Just winningBid ->
             if get #bidType winningBid == Internet || get #price winningBid < 500
                 then do
-                    threadDelay (2 * 1000000)
+                    threadDelay (1 * 1000000)
 
                     triggeredBid <-
                         newRecord @Bid
