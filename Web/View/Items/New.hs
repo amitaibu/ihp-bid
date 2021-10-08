@@ -63,6 +63,7 @@ renderFormBidStep (index, bidStep) =
                 Min
             </label>
             <input type="number" name="min"
+            required
             value={if didChange #min bidStep then inputValue (get #min bidStep) else ""}
             class={classes ["form-control", ("is-invalid", isInvalidMin)]}/>
             {minFeedback}
@@ -73,6 +74,7 @@ renderFormBidStep (index, bidStep) =
                 Max
             </label>
             <input type="number" name="max"
+            required
             value={if didChange #max bidStep then inputValue (get #max bidStep) else ""}
             class={classes ["form-control", ("is-invalid", isInvalidMax)]}/>
             {maxFeedback}
@@ -82,7 +84,8 @@ renderFormBidStep (index, bidStep) =
             <label>
                 Step
             </label>
-            <input type="number" name="max"
+            <input type="number" name="step"
+            required
             value={if didChange #step bidStep then inputValue (get #step bidStep) else ""}
             class={classes ["form-control", ("is-invalid", isInvalidStep)]}/>
             {stepFeedback}
