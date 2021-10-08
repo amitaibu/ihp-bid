@@ -1,12 +1,14 @@
 module Web.View.Items.Show where
+
+import Web.Controller.Bids (getWinningBid, isWinningBid)
 import Web.View.Prelude
-import Web.Controller.Bids ( getWinningBid )
 
 data ShowView = ShowView
-    { item :: Include "bids" (Include "bidSteps" Item) }
+    {item :: Include' ["bids", "bidSteps"] Item}
 
 instance View ShowView where
-    html ShowView { .. } = [hsx|
+    html ShowView{..} =
+        [hsx|
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href={ItemsAction}>Items</a></li>
@@ -22,16 +24,11 @@ instance View ShowView where
             <a class="btn btn-primary mb-4" href={NewBidAction (get #id item)}>Add Bid</a>
         </div>
 
-        <div>
-            Current winning Bid: {show $ getWinningBid (get #bids item)}
-        </div>
-
         {renderBidsTable item}
 
         {renderBidStepsTable item}
 
     |]
-
 
 renderBidsTable item =
     if null (get #bids item)
@@ -53,15 +50,14 @@ renderBidsTable item =
                             </tr>
                         </thead>
                         <tbody>
-                            {forEachWithIndex (get #bids item |> reverse) (renderBid (get #bids item |> length))}
+                            {forEachWithIndex (get #bids item |> reverse) (renderBid item (get #bids item |> length))}
                         </tbody>
                     </table>
             |]
 
-
-
-renderBid totalBids (index, bid) = [hsx|
-    <tr>
+renderBid item totalBids (index, bid) =
+    [hsx|
+    <tr class={classes [("table-success", isWinningBid item bid)]}>
         <td>{totalBids - index}</td>
         <td>${get #price bid}</td>
         <td>{get #status bid}</td>
@@ -70,7 +66,6 @@ renderBid totalBids (index, bid) = [hsx|
         <td><a href={EditBidAction (get #id bid)}>Edit</a></td>
     </tr>
 |]
-
 
 renderBidStepsTable item =
     if null (get #bidSteps item)
@@ -98,7 +93,8 @@ renderBidStepsTable item =
                 </details>
             |]
 
-renderBidStep (index, bidStep) = [hsx|
+renderBidStep (index, bidStep) =
+    [hsx|
     <tr>
         <td>{index + 1}</td>
         <td>{get #min bidStep}</td>
@@ -106,4 +102,3 @@ renderBidStep (index, bidStep) = [hsx|
         <td>{get #step bidStep}</td>
     </tr>
 |]
-

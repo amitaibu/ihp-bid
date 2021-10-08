@@ -13,8 +13,9 @@ instance Controller BidsController where
         bids <- query @Bid |> fetch
         render IndexView{..}
     action NewBidAction{itemId} = do
-        item <- fetch itemId
-        itemBids <- fetch (get #bids item)
+        item <-
+            fetch itemId
+                >>= fetchRelated #bids
 
         let bid' =
                 newRecord
@@ -25,7 +26,7 @@ instance Controller BidsController where
                     |> set #price 10
 
         let bid =
-                case getWinningBid itemBids of
+                case getWinningBid item of
                     Nothing -> bid'
                     Just winningBid ->
                         bid'
@@ -61,18 +62,15 @@ instance Controller BidsController where
 
         item <-
             fetch (get #itemId bid)
-                >>= pure . modify #bids (orderBy #createdAt)
                 >>= fetchRelated #bids
 
         bid
             |> validateType item
             |> ifValid \case
                 Left bid -> do
-                    item <- fetch (get #itemId bid)
-                    itemBids <- fetch (get #bids item)
                     render NewView{..}
                 Right bid -> do
-                    bid |> create
+                    bid <- bid |> create
 
                     -- Create a Job for the Bid to be processed.
                     newRecord @BidJob
@@ -106,9 +104,8 @@ buildBidUpdate bid =
     bid
         |> fill @'["status"]
 
-getWinningBid :: [Bid] -> Maybe Bid
-getWinningBid bids = do
-    case bids of
+getWinningBid item = do
+    case get #bids item of
         [] -> Nothing
         xs ->
             foldr
@@ -126,3 +123,8 @@ getWinningBid bids = do
                 )
                 Nothing
                 xs
+
+isWinningBid item bid =
+    case getWinningBid item of
+        Nothing -> False
+        Just winningBid -> get #id winningBid == get #id bid

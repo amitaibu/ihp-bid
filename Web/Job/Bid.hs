@@ -1,5 +1,6 @@
 module Web.Job.Bid where
 
+import Control.Concurrent (threadDelay)
 import Web.Controller.Bids
 import Web.Controller.Prelude
 
@@ -44,9 +45,7 @@ instance Job BidJob where
 
 validateIsPriceAboveOtherBids :: Include "bids" Item -> Bid -> Bid
 validateIsPriceAboveOtherBids item bid = do
-    let bids = get #bids item
-
-    case getWinningBid bids of
+    case getWinningBid item of
         Nothing ->
             -- No winning bid, so validate above 0.
             bid
@@ -61,28 +60,30 @@ validateIsPriceAboveOtherBids item bid = do
 
 triggerPreRegisteredBid :: (?modelContext :: ModelContext) => Bid -> IO ()
 triggerPreRegisteredBid bid = do
-    pure ()
+    item <-
+        fetch (get #itemId bid)
+            >>= fetchRelated #bids
 
--- item <- fetch (get #itemId bid)
--- itemBids <- fetch (get #bids item)
--- mMailBid <- case getWinningBid itemBids of
---     Nothing -> pure Nothing
---     Just winningBid ->
---         if get #bidType winningBid == Internet || get #price winningBid < 500
---             then do
---                 -- threadDelay (2 * 1000000)
+    case getWinningBid item of
+        Nothing -> pure ()
+        Just winningBid ->
+            if get #bidType winningBid == Internet || get #price winningBid < 500
+                then do
+                    -- threadDelay (2 * 1000000)
 
---                 mailBid <- newRecord @Bid
---                         |> set #itemId (get #itemId bid)
---                         -- Internet bid type by default.
---                         |> set #bidType AutoMail
---                         |> set #price (get #price winningBid + 10)
---                         |> createRecord
+                    mailBid <-
+                        newRecord @Bid
+                            |> set #itemId (get #itemId bid)
+                            -- Internet bid type by default.
+                            |> set #bidType AutoMail
+                            |> set #price (get #price winningBid + 10)
+                            |> set #status Queued
+                            |> createRecord
 
---                 triggerPreRegisteredBid mailBid
+                    -- Create a Job for the Bid to be processed.
+                    newRecord @BidJob
+                        |> set #bidId (get #id bid)
+                        |> create
 
---                 Just mailBid |> pure
---             else
---                 pure Nothing
-
--- pure ()
+                    pure ()
+                else pure ()
