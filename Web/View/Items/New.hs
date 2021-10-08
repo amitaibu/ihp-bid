@@ -1,10 +1,12 @@
 module Web.View.Items.New where
+
 import Web.View.Prelude
 
-data NewView = NewView { item :: Item, bidSteps :: [BidStep] }
+data NewView = NewView {item :: Item, bidSteps :: [BidStep]}
 
 instance View NewView where
-    html NewView { .. } = [hsx|
+    html NewView{..} =
+        [hsx|
 
         <script src={assetPath "/multiple-field.js"} />
 
@@ -19,8 +21,13 @@ instance View NewView where
     |]
 
 renderForm :: Item -> [BidStep] -> Html
-renderForm item bidSteps = formFor item [hsx|
+renderForm item bidSteps =
+    formFor
+        item
+        [hsx|
     {(textField #title)}
+
+    {selectField #status allStatus}
 
     <div class="multiple-field-wrapper border p-4 my-4">
 
@@ -29,16 +36,22 @@ renderForm item bidSteps = formFor item [hsx|
 
         </div>
 
-
-
         <div class="multiple-field-add btn btn-secondary mt-4">Add Another Bid Step</div>
     </div>
 
     {submitButton}
 |]
+  where
+    allStatus = allEnumValues @ItemStatus
+
+instance CanSelect ItemStatus where
+    type SelectValue ItemStatus = ItemStatus
+    selectValue value = value
+    selectLabel = tshow
 
 -- renderFormBidStep :: BidStep -> Html
-renderFormBidStep (index, bidStep) = [hsx|
+renderFormBidStep (index, bidStep) =
+    [hsx|
     <fieldset class="multiple-field border p-4 my-4">
         <div class="d-flex flex-row justify-content-between">
             <h3>Bid Step</h3>
@@ -76,19 +89,19 @@ renderFormBidStep (index, bidStep) = [hsx|
         </div>
     </fieldset>
 |]
-    where
-        isInvalidMin = isJust (getValidationFailure #min bidStep)
-        isInvalidMax = isJust (getValidationFailure #max bidStep)
-        isInvalidStep = isJust (getValidationFailure #step bidStep)
+  where
+    isInvalidMin = isJust (getValidationFailure #min bidStep)
+    isInvalidMax = isJust (getValidationFailure #max bidStep)
+    isInvalidStep = isJust (getValidationFailure #step bidStep)
 
-        minFeedback = case getValidationFailure #min bidStep of
-            Just result -> [hsx|<div class="invalid-feedback">{result}</div>|]
-            Nothing -> mempty
+    minFeedback = case getValidationFailure #min bidStep of
+        Just result -> [hsx|<div class="invalid-feedback">{result}</div>|]
+        Nothing -> mempty
 
-        maxFeedback = case getValidationFailure #max bidStep of
-            Just result -> [hsx|<div class="invalid-feedback">{result}</div>|]
-            Nothing -> mempty
+    maxFeedback = case getValidationFailure #max bidStep of
+        Just result -> [hsx|<div class="invalid-feedback">{result}</div>|]
+        Nothing -> mempty
 
-        stepFeedback = case getValidationFailure #step bidStep of
-            Just result -> [hsx|<div class="invalid-feedback">{result}</div>|]
-            Nothing -> mempty
+    stepFeedback = case getValidationFailure #step bidStep of
+        Just result -> [hsx|<div class="invalid-feedback">{result}</div>|]
+        Nothing -> mempty

@@ -1,4 +1,5 @@
 module Web.View.Bids.Edit where
+
 import Web.View.Prelude
 
 data EditView = EditView
@@ -7,7 +8,8 @@ data EditView = EditView
     }
 
 instance View EditView where
-    html EditView { .. } = [hsx|
+    html EditView{..} =
+        [hsx|
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href={ShowItemAction (get #itemId bid)}>Item {get #title item}</a></li>
@@ -19,7 +21,10 @@ instance View EditView where
     |]
 
 renderForm :: Bid -> Html
-renderForm bid = formFor bid [hsx|
+renderForm bid =
+    formFor
+        bid
+        [hsx|
     {(hiddenField #itemId)}
     {(hiddenField #status)}
     {(numberField #price) { disabled = True }}

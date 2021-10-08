@@ -44,6 +44,9 @@ instance Job BidJob where
 
     maxAttempts = 1
 
+    -- Max 2 seconds to process each Bid.
+    timeoutInMicroseconds = Just $ 1000000 * 2
+
 triggerPreRegisteredBid :: (?modelContext :: ModelContext) => Bid -> IO ()
 triggerPreRegisteredBid bid = do
     item <-

@@ -40,8 +40,8 @@ instance Controller ItemsController where
         item <- fetch itemId
         item
             |> buildItem
-            |> validateNoOtherActiveItem
-            >>= validateNoRecentBid
+            -- |> validateNoOtherActiveItem
+            |> validateNoRecentBid
             >>= ifValid \case
                 Left item -> render EditView { .. }
                 Right item -> do
@@ -55,7 +55,7 @@ instance Controller ItemsController where
 
         item
             |> buildItem
-            |> set #status Inactive
+            |> set #status Active
             |> ifValid \case
                 Left item -> render NewView { .. }
                 Right item -> do
