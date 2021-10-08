@@ -30,33 +30,19 @@ instance Job BidJob where
                         |> set #status status
                         |> updateRecord
 
+                    pure ()
+                Right bid -> do
+                    bid <-
+                        bid
+                            |> set #status Accepted
+                            |> updateRecord
+
                     -- Trigger pre-registered bids.
                     triggerPreRegisteredBid bid
-                Right bid -> do
-                    bid
-                        |> set #status Accepted
-                        |> updateRecord
-
-                    pure ()
 
         pure ()
 
     maxAttempts = 1
-
-validateIsPriceAboveOtherBids :: Include "bids" Item -> Bid -> Bid
-validateIsPriceAboveOtherBids item bid = do
-    case getWinningBid item of
-        Nothing ->
-            -- No winning bid, so validate above 0.
-            bid
-                |> validateField #price (isGreaterThan 0)
-        Just winningBid ->
-            -- Make sure we don't validate against self Bid.
-            if get #id winningBid == get #id bid
-                then bid
-                else bid |> validateField #price (isGreaterThan price |> withCustomErrorMessage "Price too low")
-          where
-            price = get #price winningBid
 
 triggerPreRegisteredBid :: (?modelContext :: ModelContext) => Bid -> IO ()
 triggerPreRegisteredBid bid = do
@@ -71,18 +57,20 @@ triggerPreRegisteredBid bid = do
                 then do
                     -- threadDelay (2 * 1000000)
 
-                    mailBid <-
+                    triggeredBid <-
                         newRecord @Bid
                             |> set #itemId (get #itemId bid)
                             -- Internet bid type by default.
                             |> set #bidType AutoMail
+                            -- Bump the price.
                             |> set #price (get #price winningBid + 10)
+                            -- Bid is initially queued.
                             |> set #status Queued
                             |> createRecord
 
                     -- Create a Job for the Bid to be processed.
                     newRecord @BidJob
-                        |> set #bidId (get #id bid)
+                        |> set #bidId (get #id triggeredBid)
                         |> create
 
                     pure ()

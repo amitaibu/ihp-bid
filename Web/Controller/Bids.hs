@@ -45,7 +45,7 @@ instance Controller BidsController where
     action UpdateBidAction{bidId} = do
         bid <- fetch bidId
         bid
-            |> buildBidUpdate
+            |> fill @'["status"]
             |> ifValid \case
                 Left bid -> do
                     item <- fetch (get #itemId bid)
@@ -66,6 +66,7 @@ instance Controller BidsController where
 
         bid
             |> validateType item
+            |> validateIsPriceAboveOtherBids item
             |> ifValid \case
                 Left bid -> do
                     render NewView{..}
@@ -99,10 +100,20 @@ validateType item bid = do
                 then bid |> attachFailure #bidType ("Item is Inactive, so Bid cannot be of type " ++ show bidType)
                 else bid
 
-buildBidUpdate :: (?context :: ControllerContext, ?modelContext :: ModelContext) => Bid -> Bid
-buildBidUpdate bid =
-    bid
-        |> fill @'["status"]
+validateIsPriceAboveOtherBids :: Include "bids" Item -> Bid -> Bid
+validateIsPriceAboveOtherBids item bid = do
+    case getWinningBid item of
+        Nothing ->
+            -- No winning bid, so validate above 0.
+            bid
+                |> validateField #price (isGreaterThan 0)
+        Just winningBid ->
+            -- Make sure we don't validate against self Bid.
+            if get #id winningBid == get #id bid
+                then bid
+                else bid |> validateField #price (isGreaterThan price |> withCustomErrorMessage "Price too low")
+          where
+            price = get #price winningBid
 
 getWinningBid item = do
     case get #bids item of
