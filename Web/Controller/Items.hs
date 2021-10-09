@@ -19,8 +19,10 @@ instance Controller ItemsController where
                 |> fetch
                 >>= collectionFetchRelated #bids
 
+        -- Get the Item Ids.
         let itemIds = map (get #id) items
 
+        -- Get the Count just for those Items.
         bidsCount :: [(Id Item, Int)] <- sqlQuery "select item_id, count(*) from bids GROUP BY item_id" ()
 
         render IndexView { .. }
