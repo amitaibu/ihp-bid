@@ -59,7 +59,7 @@ triggerPreRegisteredBid bid = do
         Just winningBid ->
             if get #bidType winningBid == Internet || get #price winningBid < 500
                 then do
-                    threadDelay (1 * 1000000)
+                    -- threadDelay (1 * 1000000)
 
                     triggeredBid <-
                         newRecord @Bid

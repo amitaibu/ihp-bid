@@ -131,9 +131,7 @@ getWinningBid item =
             ( \bid accum ->
                 case accum of
                     Nothing ->
-                        if get #status bid /= Accepted
-                            then accum
-                            else Just bid
+                            Just bid
                     Just highestBid ->
                         if get #price bid > get #price highestBid
                             then Just bid
