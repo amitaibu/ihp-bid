@@ -122,25 +122,24 @@ validateIsPriceAboveOtherBids item bid = do
           where
             price = get #price winningBid
 
-getWinningBid item = do
-    case get #bids item of
-        [] -> Nothing
-        xs ->
-            foldr
-                ( \bid accum ->
-                    case accum of
-                        Nothing ->
-                            if get #status bid /= Accepted
-                                then accum
-                                else Just bid
-                        Just highestBid ->
-                            if get #status highestBid /= Accepted || get #price bid > get #price highestBid
-                                then -- Skip any non accepted items, or Bids with lower price.
-                                    accum
-                                else Just highestBid
-                )
-                Nothing
-                xs
+getWinningBid item =
+    do
+        item
+        |> get #bids
+        |> filter (\bid -> get #status bid == Accepted)
+        |> foldr
+            ( \bid accum ->
+                case accum of
+                    Nothing ->
+                        if get #status bid /= Accepted
+                            then accum
+                            else Just bid
+                    Just highestBid ->
+                        if get #price bid > get #price highestBid
+                            then Just bid
+                            else accum
+            )
+            Nothing
 
 isWinningBid item bid =
     case getWinningBid item of
