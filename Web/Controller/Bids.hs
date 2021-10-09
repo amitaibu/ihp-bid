@@ -29,8 +29,10 @@ instance Controller BidsController where
                     -- Default opening price
                     |> set #price 10
 
+        let winningBid = getWinningBid item
+
         let bid =
-                case getWinningBid item of
+                case winningBid of
                     Nothing -> bid'
                     Just winningBid ->
                         bid'
@@ -73,6 +75,7 @@ instance Controller BidsController where
             |> validateIsPriceAboveOtherBids item
             |> ifValid \case
                 Left bid -> do
+                    let winningBid = getWinningBid item
                     render NewView{..}
                 Right bid -> do
                     bid <- bid |> create

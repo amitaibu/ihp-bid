@@ -5,6 +5,7 @@ import Web.View.Prelude
 data NewView = NewView
     { bid :: Bid
     , item :: Include "bids" Item
+    , winningBid :: Maybe Bid
     }
 
 instance View NewView where
@@ -17,11 +18,11 @@ instance View NewView where
             </ol>
         </nav>
         <h1>New Bid</h1>
-        {renderForm item bid}
+        {renderForm item winningBid bid}
     |]
 
-renderForm :: Include "bids" Item -> Bid -> Html
-renderForm item bid =
+renderForm :: Include "bids" Item -> Maybe Bid -> Bid -> Html
+renderForm item winningBid bid =
     formFor
         bid
         [hsx|
@@ -39,8 +40,9 @@ renderForm item bid =
     |]
   where
     highestBidPrice =
-        map (get #price) (get #bids item)
-            |> maximum'
+        case winningBid of
+            Nothing -> 0
+            Just winningBid -> get #price winningBid
 
     -- Auto-* bids are auto created, and cannot be created manually.
     nonSelectableBidTypes = [AutoAgent, AutoMail]
