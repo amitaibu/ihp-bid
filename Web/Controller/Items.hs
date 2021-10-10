@@ -20,10 +20,9 @@ instance Controller ItemsController where
                 >>= collectionFetchRelated #bids
 
         -- Get the Item Ids.
-        let itemIds = map (get #id) items
+        let itemIds = ids items
 
-        -- Get the Count just for those Items. As we query UUIDs we need to
-        -- cast them to text (`item_id::text`).
+        -- Get the Count just for those Items.
         bidsCount :: [(Id Item, Int)] <- sqlQuery "SELECT item_id, count(*) FROM bids WHERE item_id IN ? GROUP BY item_id" (Only (In itemIds))
 
         render IndexView { .. }
