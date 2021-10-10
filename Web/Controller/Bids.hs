@@ -7,7 +7,6 @@ import Web.View.Bids.New
 import Web.View.Bids.Show
 
 import Control.Concurrent (forkIO, threadDelay)
-import Web.Mail.Bids.Confirmation
 
 instance Controller BidsController where
     action BidsAction = do
