@@ -33,9 +33,10 @@ instance Job BidJob where
 
                     pure ()
                 Right bid -> do
-                    bid
-                        |> set #status Accepted
-                        |> updateRecord
+                    bid <-
+                        bid
+                            |> set #status Accepted
+                            |> updateRecord
 
                     forkIO $ sendMail ConfirmationMail{..}
 

@@ -11,5 +11,9 @@ instance BuildMail ConfirmationMail where
     from = "hi@example.com"
     html ConfirmationMail{..} =
         [hsx|
-        Hi, Bid {get #id bid} has price {get #price bid}, and status {get #status bid}
+        Hi!
+        <p>
+            This is to confirm that <strong>your Bid</strong> with the price ${get #price bid}, and status {get #status bid}
+            <div><a href="https://example.com">Click here</a> for more info</div>
+        </p>
     |]
