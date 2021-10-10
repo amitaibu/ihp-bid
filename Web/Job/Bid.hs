@@ -38,6 +38,7 @@ instance Job BidJob where
                             |> set #status Accepted
                             |> updateRecord
 
+                    -- Don't delay the job for sending an email.
                     forkIO $ sendMail ConfirmationMail{..}
 
                     case get #bidType bid of
