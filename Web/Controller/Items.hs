@@ -11,10 +11,19 @@ import Config
 
 instance Controller ItemsController where
     action ItemsAction = do
-        items <- query @Item
+        (itemsQ, pagination) <- query @Item
                 |> orderByDesc #createdAt
+                |> paginateWithOptions (defaultPaginationOptions |> set #maxItems 10)
+
+        items <- itemsQ
                 |> fetch
                 >>= collectionFetchRelated #bids
+
+        -- Get the Item Ids.
+        let itemIds = ids items
+
+        -- Get the Count just for those Items.
+        bidsCount :: [(Id Item, Int)] <- sqlQuery "SELECT item_id, count(*) FROM bids WHERE item_id IN ? GROUP BY item_id" (Only (In itemIds))
 
         render IndexView { .. }
 

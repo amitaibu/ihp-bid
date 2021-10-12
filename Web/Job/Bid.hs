@@ -1,8 +1,9 @@
 module Web.Job.Bid where
 
-import Control.Concurrent (threadDelay)
+import Control.Concurrent (forkIO, threadDelay)
 import Web.Controller.Bids
 import Web.Controller.Prelude
+import Web.Mail.Bids.Confirmation
 
 instance Job BidJob where
     perform BidJob{..} = do
@@ -32,9 +33,13 @@ instance Job BidJob where
 
                     pure ()
                 Right bid -> do
-                    bid
-                        |> set #status Accepted
-                        |> updateRecord
+                    bid <-
+                        bid
+                            |> set #status Accepted
+                            |> updateRecord
+
+                    -- Don't delay the job for sending an email.
+                    forkIO $ sendMail ConfirmationMail{..}
 
                     case get #bidType bid of
                         Mail -> pure ()
