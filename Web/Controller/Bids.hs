@@ -72,7 +72,7 @@ instance Controller BidsController where
 
         bid
             |> validateType item
-            |> validateIsPriceAboveOtherBids item
+            -- |> validateIsPriceAboveOtherBids item
             |> ifValid \case
                 Left bid -> do
                     let winningBid = getWinningBid item
