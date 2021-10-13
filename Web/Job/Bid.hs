@@ -7,6 +7,7 @@ import Web.Mail.Bids.Confirmation
 
 instance Job BidJob where
     perform BidJob{..} = do
+        -- threadDelay (1 * 1000000)
         bid <- fetch bidId
 
         item <-
@@ -24,7 +25,7 @@ instance Job BidJob where
 
                     let status =
                             case errors of
-                                ((_, "Price too low") : _) -> RejectedLowPrice
+                                ((_, TextViolation "Price too low") : _) -> RejectedLowPrice
                                 _ -> Rejected
 
                     bid
@@ -64,7 +65,7 @@ triggerPreRegisteredBid bid = do
         Just winningBid ->
             if get #bidType winningBid == Internet || get #price winningBid < 500
                 then do
-                    -- threadDelay (2 * 1000000)
+                    -- threadDelay (1 * 1000000)
 
                     triggeredBid <-
                         newRecord @Bid
