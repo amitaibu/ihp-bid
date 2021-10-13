@@ -28,9 +28,10 @@ instance Job BidJob where
                                 ((_, TextViolation "Price too low") : _) -> RejectedLowPrice
                                 _ -> Rejected
 
-                    bid
+                    bid <- bid
                         |> set #status status
                         |> updateRecord
+
 
                     pure ()
                 Right bid -> do
