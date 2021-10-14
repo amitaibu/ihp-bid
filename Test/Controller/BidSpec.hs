@@ -2,21 +2,22 @@ module Test.Controller.BidSpec where
 
 import Network.HTTP.Types.Status (status200)
 
-import IHP.FrameworkConfig (ConfigBuilder (..))
 import IHP.Prelude
 import IHP.QueryBuilder (query)
 import IHP.Test.Mocking
 import IHP.Fetch
 
+import IHP.FrameworkConfig
 import IHP.HaskellSupport
 import Test.Hspec
+import Config
 
 import Generated.Types
 import Web.Routes
 import Web.Types
 
 spec :: Spec
-spec = beforeAll (makeConfig >>= mockContext WebApplication) do
+spec = beforeAll (mockContext WebApplication config) do
     describe "User controller" $ do
         it "has no existing users" $ withContext do
             users <- query @User |> fetch
