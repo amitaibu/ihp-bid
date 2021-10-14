@@ -1,4 +1,4 @@
-module Web.Controller.BidSpec where
+module Test.Controller.BidSpec where
 
 import Network.HTTP.Types.Status (status200)
 
@@ -6,10 +6,12 @@ import IHP.FrameworkConfig (ConfigBuilder (..))
 import IHP.Prelude
 import IHP.QueryBuilder (query)
 import IHP.Test.Mocking
+import IHP.Fetch
+
+import IHP.HaskellSupport
 import Test.Hspec
 
 import Generated.Types
-import Main ()
 import Web.Routes
 import Web.Types
 
