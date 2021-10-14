@@ -15,9 +15,11 @@ import Config
 import Generated.Types
 import Web.Routes
 import Web.Types
+import Web.Controller.Users ()
+import Web.FrontController ()
 
-spec :: Spec
-spec = beforeAll (mockContext WebApplication config) do
+tests :: Spec
+tests = beforeAll (mockContext WebApplication config) do
     describe "User controller" $ do
         it "has no existing users" $ withContext do
             users <- query @User |> fetch
